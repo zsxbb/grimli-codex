@@ -110,7 +110,7 @@ namespace Grimoire.UI
         [DllImport("kernel32.dll", EntryPoint = "SetProcessWorkingSetSize")]
         private static extern int SetProcessWorkingSetSize(IntPtr process, int minimumWorkingSetSize, int maximumWorkingSetSize);
 
-        private string title = $"Grimlite Li x CODEX v2.0";
+        private string title = $"Grimlite Li x CODEX v2";
 
         public Root()
         {

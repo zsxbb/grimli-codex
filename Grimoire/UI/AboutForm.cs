@@ -14,8 +14,8 @@ namespace Grimoire.UI
 		public AboutForm()
 		{
 			InitializeComponent();
-			this.appName.Text = "Grimlite Li x CODEX v2.0";
-			this.lblVersion.Text = $"version 2.0 ({Program.ReleaseDate}) x CODEX";
+			this.appName.Text = "Grimlite Li x CODEX v2";
+			this.lblVersion.Text = $"version 2 ({Program.ReleaseDate}) x CODEX";
 		}
 
 		private void AboutForm_FormClosing(object sender, FormClosingEventArgs e)
