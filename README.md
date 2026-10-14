@@ -4,7 +4,7 @@
 
 **Advanced Client Architecture, Network Packet Engine, Cloud Script Bank & Automation Suite for AdventureQuest Worlds**
 
-[![Release](https://img.shields.io/badge/Release-v2.0_Stable-brightgreen?style=for-the-badge&logo=github)](https://github.com/zsxbb/grimli-codex/releases/latest)
+[![Release](https://img.shields.io/badge/Release-v2.0.2_Stable-brightgreen?style=for-the-badge&logo=github)](https://github.com/zsxbb/grimli-codex/releases/latest)
 [![Download Latest](https://img.shields.io/badge/Download-Full_Package_(.zip)-0078D6?style=for-the-badge&logo=windows)](https://github.com/zsxbb/grimli-codex/releases/latest)
 
 <br />
@@ -21,7 +21,7 @@
 
 </div>
 
-**Grimlite Li x CODEX v2.0** adalah platform modifikasi klien, otomasi tingkat lanjut, dan analisis protokol jaringan generasi baru untuk **AdventureQuest Worlds (AQW)**. Dikembangkan di atas arsitektur .NET Framework 4.7.2 (C# / Windows Forms) yang berpasangan secara langsung dengan runtime Flash ActiveX (Cleanflash), rilis v2.0 menghadirkan ekosistem otomasi terlengkap: **Codex Script Bank** (sinkronisasi cloud 75+ bot langsung dari GitHub), **In-App Auto-Updater** (pembaruan mandiri tanpa instal ulang), suite utilitas eksklusif **CODEX Suite**, sistem audio **Codex Voice Chat**, otomasi tim/multi-akun **Maid Remake**, serta **Core Bot Engine** berbasis logika kondisional berkemampuan tinggi.
+**Grimlite Li x CODEX v2.0.2** adalah platform modifikasi klien, otomasi tingkat lanjut, dan analisis protokol jaringan generasi baru untuk **AdventureQuest Worlds (AQW)**. Dikembangkan di atas arsitektur .NET Framework 4.7.2 (C# / Windows Forms) yang berpasangan secara langsung dengan runtime Flash ActiveX (Cleanflash), rilis v2 menghadirkan ekosistem otomasi terlengkap: **Codex Script Bank** (sinkronisasi cloud 75+ bot langsung dari GitHub), **In-App Auto-Updater** (pembaruan mandiri tanpa instal ulang), suite utilitas eksklusif **CODEX Suite**, sistem audio **Codex Voice Chat**, otomasi tim/multi-akun **Maid Remake**, serta **Core Bot Engine** berbasis logika kondisional berkemampuan tinggi.
 
 ---
 

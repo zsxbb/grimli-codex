@@ -26,6 +26,7 @@ namespace Grimoire.UI
             this.colStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colDescription = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lblStatus = new DarkUI.Controls.DarkLabel();
+            this.lblPathNote = new DarkUI.Controls.DarkLabel();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.btnSyncAll = new DarkUI.Controls.DarkButton();
             this.btnSyncSelected = new DarkUI.Controls.DarkButton();
@@ -120,6 +121,17 @@ namespace Grimoire.UI
             this.lblStatus.TabIndex = 4;
             this.lblStatus.Text = "Ready.";
             // 
+            // lblPathNote
+            // 
+            this.lblPathNote.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblPathNote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(140)))), ((int)(((byte)(140)))), ((int)(((byte)(155)))));
+            this.lblPathNote.Location = new System.Drawing.Point(370, 362);
+            this.lblPathNote.Name = "lblPathNote";
+            this.lblPathNote.Size = new System.Drawing.Size(292, 13);
+            this.lblPathNote.TabIndex = 10;
+            this.lblPathNote.Text = "All Scripts saved in /Bots/CodexBank/";
+            this.lblPathNote.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
             // progressBar
             // 
             this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -179,6 +191,7 @@ namespace Grimoire.UI
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(46)))));
             this.ClientSize = new System.Drawing.Size(674, 448);
+            this.Controls.Add(this.lblPathNote);
             this.Controls.Add(this.btnOpenFolder);
             this.Controls.Add(this.btnRefresh);
             this.Controls.Add(this.btnSyncSelected);
@@ -212,6 +225,7 @@ namespace Grimoire.UI
         private System.Windows.Forms.ColumnHeader colStatus;
         private System.Windows.Forms.ColumnHeader colDescription;
         private DarkUI.Controls.DarkLabel lblStatus;
+        private DarkUI.Controls.DarkLabel lblPathNote;
         private System.Windows.Forms.ProgressBar progressBar;
         private DarkUI.Controls.DarkButton btnSyncAll;
         private DarkUI.Controls.DarkButton btnSyncSelected;
