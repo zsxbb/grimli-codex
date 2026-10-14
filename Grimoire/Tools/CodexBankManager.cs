@@ -96,7 +96,7 @@ namespace Grimoire.Tools
 
         public const string MANIFEST_URL = "https://raw.githubusercontent.com/zsxbb/grimli-codex/main/CodexBank/manifest.json";
         public const string RAW_BASE_URL = "https://raw.githubusercontent.com/zsxbb/grimli-codex/main/CodexBank/";
-        public const string CURRENT_APP_VERSION = "2.0";
+        public const string CURRENT_APP_VERSION = "2.0.1";
 
         public string LocalBankDirectory => Path.Combine(Application.StartupPath, "Bots", "CodexBank");
 
@@ -266,19 +266,29 @@ namespace Grimoire.Tools
                 string exeName = Path.GetFileName(currentExePath);
                 string newExeName = Path.GetFileName(newExePath);
 
-                string cmdArgs = $"/C ping 127.0.0.1 -n 3 > nul & move /Y \"{newExeName}\" \"{exeName}\" & start \"\" \"{exeName}\"";
+                string batPath = Path.Combine(currentExeDir, "update_apply.bat");
+                string batContent =
+                    "@echo off\r\n" +
+                    ":retry\r\n" +
+                    "ping 127.0.0.1 -n 2 > nul\r\n" +
+                    $"move /Y \"{newExeName}\" \"{exeName}\" >nul 2>&1\r\n" +
+                    $"if exist \"{newExeName}\" goto retry\r\n" +
+                    $"start \"\" \"{exeName}\"\r\n" +
+                    "(goto) 2>nul & del \"%~f0\"\r\n";
+
+                File.WriteAllText(batPath, batContent);
 
                 ProcessStartInfo psi = new ProcessStartInfo
                 {
                     FileName = "cmd.exe",
-                    Arguments = cmdArgs,
+                    Arguments = $"/c \"{batPath}\"",
                     WorkingDirectory = currentExeDir,
                     CreateNoWindow = true,
                     UseShellExecute = false
                 };
 
                 Process.Start(psi);
-                Application.Exit();
+                Environment.Exit(0);
             }
             catch (Exception ex)
             {
