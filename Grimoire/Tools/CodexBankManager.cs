@@ -466,6 +466,13 @@ namespace Grimoire.Tools
             HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(20);
             client.DefaultRequestHeaders.Add("User-Agent", "Grimlite-Codex-Client");
+            client.DefaultRequestHeaders.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
+            {
+                NoCache = true,
+                NoStore = true,
+                MustRevalidate = true
+            };
+            client.DefaultRequestHeaders.Pragma.Add(new System.Net.Http.Headers.NameValueHeaderValue("no-cache"));
             return client;
         }
     }
