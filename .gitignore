@@ -7,10 +7,11 @@
 *.sln.docstates
 .vs/
 
-## NuGet
+## NuGet & Fody
 packages/*
 !packages/repositories.config
 !packages.config
+FodyWeavers.xsd
 
 ## Scratch / Temp
 scratch/
