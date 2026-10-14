@@ -26,8 +26,8 @@ namespace Grimoire.Tools
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("category")]
-        public string Category { get; set; } = "General";
+        [JsonProperty("credit")]
+        public string Credit { get; set; } = "-";
 
         [JsonProperty("description")]
         public string Description { get; set; } = "";

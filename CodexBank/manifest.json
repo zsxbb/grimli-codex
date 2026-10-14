@@ -6,453 +6,453 @@
   "scripts": [
     {
       "name": "Archmage/1 Tapping Into the Arcane.gbot",
-      "category": "Archmage",
+      "credit": "jib-akbr",
       "description": "Archmage quest bot: 1 Tapping Into the Arcane.",
       "sha256": "3405249A164E02622CC4338D7CD44494AE8F302C50F031B2970536891F3C7437"
     },
     {
       "name": "Archmage/2 Aethereal Flow.gbot",
-      "category": "Archmage",
+      "credit": "jib-akbr",
       "description": "Archmage quest bot: 2 Aethereal Flow.",
       "sha256": "2FD18D9CDAAF530653B346907C22C9E8A7E4A703268FD3346C36EBD11257264B"
     },
     {
       "name": "Archmage/3 Tracing Ley Lines.gbot",
-      "category": "Archmage",
+      "credit": "jib-akbr",
       "description": "Archmage quest bot: 3 Tracing Ley Lines.",
       "sha256": "1DFE0DEDBF24967A2502642A4846BBEDE3D09CF226C165848C75E5E1DE381DA7"
     },
     {
       "name": "Archmage/4 Thaumaturgy.gbot",
-      "category": "Archmage",
+      "credit": "jib-akbr",
       "description": "Archmage quest bot: 4 Thaumaturgy.",
       "sha256": "A84B9ED7A430630051B818F539D02D1E0ED2A438EEE572C85E221206AF977D81"
     },
     {
       "name": "Archmage/5 Book of Magus - Incantation.gbot",
-      "category": "Archmage",
+      "credit": "jib-akbr",
       "description": "Archmage quest bot: 5 Book of Magus - Incantation.",
       "sha256": "DE0514DCC9FFE707B79E500B1A805C4B90210FBC93BA80FDA2156B62930235F4"
     },
     {
       "name": "Archmage/6 Book of Fire - Immolation.gbot",
-      "category": "Archmage",
+      "credit": "jib-akbr",
       "description": "Archmage quest bot: 6 Book of Fire - Immolation.",
       "sha256": "BB50DB041F30F2DFA8A1CAB7C51C26C7839FDC99553197873F7764C2FE39E4B1"
     },
     {
       "name": "Archmage/7 Book of Ice - Glacial Impact.gbot",
-      "category": "Archmage",
+      "credit": "jib-akbr",
       "description": "Archmage quest bot: 7 Book of Ice - Glacial Impact.",
       "sha256": "F4761EC6E8A5CE7E07F43A2E17CD7D86F1BB4863B672EFDED529705A824070AB"
     },
     {
       "name": "Archmage/8 Book of Aether - Supernova.gbot",
-      "category": "Archmage",
+      "credit": "jib-akbr",
       "description": "Archmage quest bot: 8 Book of Aether - Supernova.",
       "sha256": "DEFE14996680A8CA1A5194F854564FC42CE89D271057B9BCB23D1756F8DC2DFE"
     },
     {
       "name": "Archmage/9 Book of Arcana - Arcane Sigil.gbot",
-      "category": "Archmage",
+      "credit": "jib-akbr",
       "description": "Archmage quest bot: 9 Book of Arcana - Arcane Sigil.",
       "sha256": "A50638D25EED458101C01BD3FF2C8838797E1560A0CED4A0AB6C75B33EA2452D"
     },
     {
       "name": "Archmage/Unbound Thread.gbot",
-      "category": "Archmage",
+      "credit": "jib-akbr",
       "description": "Archmage quest bot: Unbound Thread.",
       "sha256": "809C433A360AF163811EC50FE4CD64435F12C2470EB0A75417565A28F5B9DABA"
     },
     {
+      "name": "AutoGrimDungeon.gbot",
+      "credit": "jib-akbr",
+      "description": "Auto clear Grim Dungeon rooms and bosses.",
+      "sha256": "596D223F84C0F0C23005DC9B8AC660E20E615055095E9AD733FC69AB9A68FB93"
+    },
+    {
       "name": "Class Combo/Arcana Invoker.gbot",
-      "category": "Class Combo",
+      "credit": "jib-akbr",
       "description": "Arcana Invoker bot script.",
       "sha256": "658CBC08495FB44BE9A30EC076F54AA5D851A55B88105B1979CFF9A331C1E094"
     },
     {
       "name": "Class Combo/ArchMage - Defense.gbot",
-      "category": "Class Combo",
+      "credit": "jib-akbr",
       "description": "ArchMage - Defense bot script.",
       "sha256": "C64F10844CB7760C39A51D06211008AA1492D5FA2CE7C8537BD850B29A83F696"
     },
     {
       "name": "Class Combo/TimeKeeper.gbot",
-      "category": "Class Combo",
+      "credit": "jib-akbr",
       "description": "TimeKeeper bot script.",
       "sha256": "3EB13B1351B3B0F9A579E1F837AFEE99BEB835D39D9D5911EB38529365AF743A"
     },
     {
       "name": "Class Combo/Underworld Chronomancer - Power.gbot",
-      "category": "Class Combo",
+      "credit": "jib-akbr",
       "description": "Underworld Chronomancer - Power bot script.",
       "sha256": "66BCBB7D3026D1FACE5E4674B57E0707A3796F25B9F55F10BF5DE025DD74B8B3"
     },
     {
       "name": "Darkon/A Melody.gbot",
-      "category": "Darkon",
+      "credit": "jib-akbr",
       "description": "Darkon quest farm bot: A Melody.",
       "sha256": "E0975FB8E846E18D624ACE59351FDF97D3A4D15B587F31F699B60D33CFC3907A"
     },
     {
       "name": "Darkon/Ancient Remnant.gbot",
-      "category": "Darkon",
+      "credit": "jib-akbr",
       "description": "Darkon quest farm bot: Ancient Remnant.",
       "sha256": "A7301081FD8A47DBE87627D8C1C78E5E9697C374E3DF172B844C0F5643EDC7AD"
     },
     {
       "name": "Darkon/Astravian Medal.gbot",
-      "category": "Darkon",
+      "credit": "jib-akbr",
       "description": "Darkon quest farm bot: Astravian Medal.",
       "sha256": "E5BB44BA02EE14CB420C94765A491EB586052F98C9E9849505A7061F6247954E"
     },
     {
       "name": "Darkon/Banana-arcangrove.gbot",
-      "category": "Darkon",
+      "credit": "jib-akbr",
       "description": "Darkon quest farm bot: Banana-arcangrove.",
       "sha256": "A16144865049C9C0F11004B0DCB634E4A7CFA7938893B8E7B23100CD8F2B02A7"
     },
     {
       "name": "Darkon/Banana-portalmaze.gbot",
-      "category": "Darkon",
+      "credit": "jib-akbr",
       "description": "Darkon quest farm bot: Banana-portalmaze.",
       "sha256": "A3D13C8862B071BC7F0868520DF7A7EC0262AFCC1103AD5A6BAA0871D523EB72"
     },
     {
       "name": "Darkon/Banana-towefofdoom.gbot",
-      "category": "Darkon",
+      "credit": "jib-akbr",
       "description": "Darkon quest farm bot: Banana-towefofdoom.",
       "sha256": "C99AC6BFF460D426512FA49146995E2E32D7666A3459EA80375EBD7B4B5FD5FC"
     },
     {
       "name": "Darkon/Bandit Correspondence.gbot",
-      "category": "Darkon",
+      "credit": "jib-akbr",
       "description": "Darkon quest farm bot: Bandit Correspondence.",
       "sha256": "E2A3FA2C51EEE7860B3DA8C8E410634CFB543608E913E1F018A5767FE35832C9"
     },
     {
       "name": "Darkon/La Gratitue.gbot",
-      "category": "Darkon",
+      "credit": "jib-akbr",
       "description": "Darkon quest farm bot: La Gratitue.",
       "sha256": "FE66DF177031D9E65958E2A6DFFCD6AB63FAC923958E7EB259F1DDE49CCB70A6"
     },
     {
       "name": "Darkon/Mourning Flower.gbot",
-      "category": "Darkon",
+      "credit": "jib-akbr",
       "description": "Darkon quest farm bot: Mourning Flower.",
       "sha256": "D7D89349936CCDA0775BA4A27C245091E2DBEA455D226D038CDDAF86255F9D51"
     },
     {
       "name": "Darkon/Suki Prestige.gbot",
-      "category": "Darkon",
+      "credit": "jib-akbr",
       "description": "Darkon quest farm bot: Suki Prestige.",
       "sha256": "CBC706872F43FA4EF98C7571D99BCE6589C0EBE02C359D4849ECE336C5E99226"
     },
     {
       "name": "Darkon/Teeth.gbot",
-      "category": "Darkon",
+      "credit": "jib-akbr",
       "description": "Darkon quest farm bot: Teeth.",
       "sha256": "FE3CAAFACDF883EACAC4B1D29192F51C50D4449609A2417B828F3EE880665A89"
     },
     {
       "name": "Darkon/Unfinished Musical Score.gbot",
-      "category": "Darkon",
+      "credit": "jib-akbr",
       "description": "Darkon quest farm bot: Unfinished Musical Score.",
       "sha256": "14035B2DED23DCACBB04C2DCFDCC607A4CAE64B113C93DD379E9569AB5473F25"
     },
     {
-      "name": "AutoGrimDungeon.gbot",
-      "category": "Dungeon",
-      "description": "Auto clear Grim Dungeon rooms and bosses.",
-      "sha256": "596D223F84C0F0C23005DC9B8AC660E20E615055095E9AD733FC69AB9A68FB93"
-    },
-    {
       "name": "Eclipse/AscendEclipse.gbot",
-      "category": "Eclipse",
+      "credit": "jib-akbr",
       "description": "Auto complete Ascend Eclipse dungeon.",
       "sha256": "CDDE58F4DE4A2C3F8508190ECA07EE8DE754F8317CB65ECBAF10A96669B8A43C"
     },
     {
-      "name": "Eclipse/MidnightSun.gbot",
-      "category": "Eclipse",
-      "description": "Midnight Sun raid team bot.",
-      "sha256": "71534908FDC3A6035F48F0F1D0EF6EA0F39D9CA3097FE32449D8F0B68B162983"
-    },
-    {
-      "name": "Eclipse/prep.gbot",
-      "category": "Eclipse",
-      "description": "Gear & quest preparation for Midnight & Solstice.",
-      "sha256": "2DD13E7A8BA9126AD7A5BCE06DA8C6F564B3AE82CFC28B8F28E2B0BC22C11029"
-    },
-    {
-      "name": "Eclipse/SolsticeMoon.gbot",
-      "category": "Eclipse",
-      "description": "Solstice Moon raid team bot.",
-      "sha256": "EEF067ABF44F4560A7BBDBC46A2DC5BBFC11F7DB0756CD844531FAED890E7CC1"
-    },
-    {
       "name": "Eclipse/Maid/AP-Solstice-P2.json",
-      "category": "Eclipse (Maid)",
+      "credit": "jib-akbr",
       "description": "Maid configuration for AP-Solstice-P2.",
       "sha256": "A388DC0CF5919318DD1F6BE0BE3EA4D0484BA90587E79BAD63E897A035211716"
     },
     {
       "name": "Eclipse/Maid/Dungeon-Follower.json",
-      "category": "Eclipse (Maid)",
+      "credit": "jib-akbr",
       "description": "Maid configuration for Dungeon-Follower.",
       "sha256": "92E81C8BE58561BD8F1EF8D1F3C32B4F873723E2FACBD61CADE23A635705ECCA"
     },
     {
       "name": "Eclipse/Maid/LOO-Midnight-P1.json",
-      "category": "Eclipse (Maid)",
+      "credit": "jib-akbr",
       "description": "Maid configuration for LOO-Midnight-P1.",
       "sha256": "A4AD1C562BEAB9CAEE6E8658166474A0BA668605CCA561A7BC9B8C35177C7C3F"
     },
     {
       "name": "Eclipse/Maid/LR-Solstice-P1.json",
-      "category": "Eclipse (Maid)",
+      "credit": "jib-akbr",
       "description": "Maid configuration for LR-Solstice-P1.",
       "sha256": "202147C800706F05441CD5F8163FABFF661D2C08720C69F178AE0F2626BDB52D"
     },
     {
       "name": "Eclipse/Maid/SC-Midnight-P2.json",
-      "category": "Eclipse (Maid)",
+      "credit": "jib-akbr",
       "description": "Maid configuration for SC-Midnight-P2.",
       "sha256": "FE61262DF503FE39E38DCD6F3AC877CB95103C074CA4121D729A1D201E9CEAB1"
     },
     {
-      "name": "New World, New Opportunities.gbot",
-      "category": "Farming",
-      "description": "Auto farm New World, New Opportunities quest.",
-      "sha256": "FAFB77637288F05ECB05B8EF4FE081FA8C16CD145337AAFF3C5CC81D47C33B88"
+      "name": "Eclipse/MidnightSun.gbot",
+      "credit": "jib-akbr",
+      "description": "Midnight Sun raid team bot.",
+      "sha256": "71534908FDC3A6035F48F0F1D0EF6EA0F39D9CA3097FE32449D8F0B68B162983"
+    },
+    {
+      "name": "Eclipse/prep.gbot",
+      "credit": "jib-akbr",
+      "description": "Gear & quest preparation for Midnight & Solstice.",
+      "sha256": "2DD13E7A8BA9126AD7A5BCE06DA8C6F564B3AE82CFC28B8F28E2B0BC22C11029"
+    },
+    {
+      "name": "Eclipse/SolsticeMoon.gbot",
+      "credit": "jib-akbr",
+      "description": "Solstice Moon raid team bot.",
+      "sha256": "EEF067ABF44F4560A7BBDBC46A2DC5BBFC11F7DB0756CD844531FAED890E7CC1"
     },
     {
       "name": "Lae/A Dark Knight - Farm.gbot",
-      "category": "Lae",
+      "credit": "jib-akbr",
       "description": "Lae Dark Knight quest bot: A Dark Knight - Farm.",
       "sha256": "DE2C4CD8DE676F6A66ED392AD6ABB86132329FF96174FD43755E8DD08EBB5756"
     },
     {
       "name": "Lae/A Dark Knight Falls.gbot",
-      "category": "Lae",
+      "credit": "jib-akbr",
       "description": "Lae Dark Knight quest bot: A Dark Knight Falls.",
       "sha256": "F1C7FBC8EBB2F1A0AA30D937623EB1ACFE1D12BF74215E7E93EDE9CAF9605CDC"
     },
     {
       "name": "Lae/A Dark Knight Returns.gbot",
-      "category": "Lae",
+      "credit": "jib-akbr",
       "description": "Lae Dark Knight quest bot: A Dark Knight Returns.",
       "sha256": "875A2FCE28DB081B002C47D5160B56446F6FFF65A1C08472ABFB9DC4581D0AA4"
     },
     {
       "name": "Lae/A Dark Knight Rises.gbot",
-      "category": "Lae",
+      "credit": "jib-akbr",
       "description": "Lae Dark Knight quest bot: A Dark Knight Rises.",
       "sha256": "9319CCE803378BF6888EFA30008071F71FCAB2C0086BA915DBB67BC9EAE66418"
     },
     {
       "name": "Lae/A Dark Knight.gbot",
-      "category": "Lae",
+      "credit": "jib-akbr",
       "description": "Lae Dark Knight quest bot: A Dark Knight.",
       "sha256": "602FA7684387A5E0DF7BD765DBB3893A6EF516FDFC6C3EEA7EE8F461A76C30B8"
     },
     {
       "name": "Lae/I Got your Back (and your Top).gbot",
-      "category": "Lae",
+      "credit": "jib-akbr",
       "description": "Lae Dark Knight quest bot: I Got your Back (and your Top).",
       "sha256": "EC9DB1CB16FA936BC925D67601EFCEF2CFA69B4CC3549DC45FB8313062A78E88"
     },
     {
       "name": "Lae/Lets Get You a Suit.gbot",
-      "category": "Lae",
+      "credit": "jib-akbr",
       "description": "Lae Dark Knight quest bot: Lets Get You a Suit.",
       "sha256": "001DA6E1783181895A418916C71347511744CD20D12CD944039076EE67D56855"
     },
     {
       "name": "Lae/The Dark Sacrifice.gbot",
-      "category": "Lae",
+      "credit": "jib-akbr",
       "description": "Lae Dark Knight quest bot: The Dark Sacrifice.",
       "sha256": "C58B33C2A37569C6F1DF8CDF668E846F0981A2031F3EBD33FE4F99FB5641BA74"
     },
     {
       "name": "LR/LF1_Li.gbot",
-      "category": "Legion Revenant",
+      "credit": "jib-akbr",
       "description": "LF1_Li bot script.",
       "sha256": "F4ED0317BDD99DD863D0133E733BD2C5F44A7D345FE25E1600B93B3E53A33E30"
     },
     {
       "name": "LR/LF2_Li.gbot",
-      "category": "Legion Revenant",
+      "credit": "jib-akbr",
       "description": "LF2_Li bot script.",
       "sha256": "0BBD2B545BF956FF38E95AF31644FC07C7C4DD55F9242A21E0251F25768CF4F4"
     },
     {
       "name": "LR/LF3_Li.gbot",
-      "category": "Legion Revenant",
+      "credit": "jib-akbr",
       "description": "LF3_Li bot script.",
       "sha256": "EDEC8C50739655906445D5F0551222A7C4BD764AA6827FD2B4F2F48AC7AA180B"
     },
     {
+      "name": "New World, New Opportunities.gbot",
+      "credit": "jib-akbr",
+      "description": "Auto farm New World, New Opportunities quest.",
+      "sha256": "FAFB77637288F05ECB05B8EF4FE081FA8C16CD145337AAFF3C5CC81D47C33B88"
+    },
+    {
       "name": "Others/Combat_Trophy_Captain_Only.gbot",
-      "category": "Others",
+      "credit": "jib-akbr",
       "description": "Combat_Trophy_Captain_Only bot script.",
       "sha256": "7D735A5FEF875814E41162DE1FA44649C1552A9BBAF93C542084746ED7B3ED32"
     },
     {
       "name": "Others/Icestormarena_R3C.gbot",
-      "category": "Others",
+      "credit": "jib-akbr",
       "description": "Icestormarena_R3C bot script.",
       "sha256": "488C42D82F38FB52C8EB422B587FE132D3CEB1EB1BF5323885AEBA28130637E4"
     },
     {
       "name": "Reputation/Alchemy_REP.gbot",
-      "category": "Reputation",
+      "credit": "jib-akbr",
       "description": "Alchemy_REP bot script.",
       "sha256": "2227C80807F0328B56E14EC7342D6DC2E878864042F68C0F8E56B24E90D55228"
     },
     {
       "name": "Ultra Boss/Champion Drakath/Taunter.gbot",
-      "category": "Ultra Boss",
+      "credit": "jib-akbr",
       "description": "Ultra Boss bot: Taunter (Champion Drakath).",
       "sha256": "09F82D41022E915B59A455363F7454481DFAEE17C9609499DE5AF023F68C4588"
     },
     {
       "name": "Ultra Boss/Dark Carnax/All.gbot",
-      "category": "Ultra Boss",
+      "credit": "jib-akbr",
       "description": "Ultra Boss bot: All (Dark Carnax).",
       "sha256": "CE020BA253BBA725BC25F7BC984B1B0C68EAA3AC4E07CE725EABC45C79A811DF"
     },
     {
       "name": "Ultra Boss/Eclipse/AscendEclipse.gbot",
-      "category": "Ultra Boss",
+      "credit": "jib-akbr",
       "description": "Ultra Boss bot: AscendEclipse (Eclipse).",
       "sha256": "55F22A91CBA6B7445D1CC8F1DC9775CCC38ACB90E46ACEF7489126D9C7F90667"
     },
     {
-      "name": "Ultra Boss/Eclipse/MidnightSun.gbot",
-      "category": "Ultra Boss",
-      "description": "Ultra Boss bot: MidnightSun (Eclipse).",
-      "sha256": "A4AE8593D5FF5E14EC0D0FFB62611AA0F52F9449087CB2D25E14BD431CCDCD8E"
-    },
-    {
-      "name": "Ultra Boss/Eclipse/SolsticeMoon.gbot",
-      "category": "Ultra Boss",
-      "description": "Ultra Boss bot: SolsticeMoon (Eclipse).",
-      "sha256": "781E739F7227376C8757E9E080354DE59DD576CEB8B0D019DC0506D29801BEDC"
-    },
-    {
-      "name": "Ultra Boss/Ultra Dage/All Class.gbot",
-      "category": "Ultra Boss",
-      "description": "Ultra Boss bot: All Class (Ultra Dage).",
-      "sha256": "6D86B20B3B4DEA55916655922CB00F236C66A5FDB1918FC03467A1CFDDD76551"
-    },
-    {
-      "name": "Ultra Boss/Ultra Darkon/class.txt",
-      "category": "Ultra Boss",
-      "description": "Class setup notes for class.",
-      "sha256": "F993301E5DB2A2BDDB67A3F883E4D8CAA456B7F5239DD3BBA4220360B3F91A24"
-    },
-    {
-      "name": "Ultra Boss/Ultra Darkon/General.gbot",
-      "category": "Ultra Boss",
-      "description": "Darkon quest farm bot: General.",
-      "sha256": "CC232D74F55F1DE50BC27E40BADB514F64309B0A3C646F12E00BC187C9AE179D"
-    },
-    {
-      "name": "Ultra Boss/Ultra Drago/Algie-First.gbot",
-      "category": "Ultra Boss",
-      "description": "Ultra Boss bot: Algie-First (Ultra Drago).",
-      "sha256": "4F1F6D270AA2C5E7B015A8E370369A9A6486E5F37D4681A3DE077533727A4770"
-    },
-    {
-      "name": "Ultra Boss/Ultra Drago/class.txt",
-      "category": "Ultra Boss",
-      "description": "Class setup notes for class.",
-      "sha256": "2FDFD0499FBD6E99E545C5772D3428AED14AFD2AABE7A030BF2519186F9CBDF7"
-    },
-    {
-      "name": "Ultra Boss/Ultra Drago/Dene-First-Taunt.gbot",
-      "category": "Ultra Boss",
-      "description": "Ultra Boss bot: Dene-First-Taunt (Ultra Drago).",
-      "sha256": "58CBD7309CC520FEB9E50F5596B9E40490E9C595AD472D8A2BA0A8590F6EDF94"
-    },
-    {
-      "name": "Ultra Boss/Ultra Nulgath/class.txt",
-      "category": "Ultra Boss",
-      "description": "Class setup notes for class.",
-      "sha256": "9B1E926E9214923FB1F3EABC6FD80EA707931FDBFFDC3DAFBC42BD257ADBCFC6"
-    },
-    {
-      "name": "Ultra Boss/Ultra Nulgath/Generic-Nulgath.gbot",
-      "category": "Ultra Boss",
-      "description": "Ultra Boss bot: Generic-Nulgath (Ultra Nulgath).",
-      "sha256": "D9A3D001FAE3A1DB8A9D9A0DF3114EE24F48C4CFF78BD540DA74E2427F9830F7"
-    },
-    {
-      "name": "Ultra Boss/Ultra Nulgath/Taunter-Nulgath.gbot",
-      "category": "Ultra Boss",
-      "description": "Ultra Boss bot: Taunter-Nulgath (Ultra Nulgath).",
-      "sha256": "1E38A3A3D36965A0B81F7DC828A7619CDF7A2F5737D5D1194CC57B1CF77390AD"
-    },
-    {
-      "name": "Ultra Boss/Ultra Timeinn/class.txt",
-      "category": "Ultra Boss",
-      "description": "Class setup notes for class.",
-      "sha256": "83A746DC57D3233342A94AAE110C6E20CD9072D53C203620EBA4B7E8EA34ABC1"
-    },
-    {
-      "name": "Ultra Boss/Ultra Timeinn/General-Timeinn.gbot",
-      "category": "Ultra Boss",
-      "description": "Ultra Boss bot: General-Timeinn (Ultra Timeinn).",
-      "sha256": "67AB562D4A9A1AA957DB17553E3BC10371E7665DFF8495AB0ED997C7C4E11095"
-    },
-    {
-      "name": "Ultra Boss/Ultra Tyndarius/Avatar-Taunter.gbot",
-      "category": "Ultra Boss",
-      "description": "Ultra Boss bot: Avatar-Taunter (Ultra Tyndarius).",
-      "sha256": "321CD9DEC3D58D1818CFDEBFA036630C6004C49B4ACB6831978F246573B6672D"
-    },
-    {
-      "name": "Ultra Boss/Ultra Tyndarius/class.txt",
-      "category": "Ultra Boss",
-      "description": "Class setup notes for class.",
-      "sha256": "CBCDE04CAB5EE472CD2471BFF2BB52D96ACDFD9E3B7E47486452190DD68988D5"
-    },
-    {
-      "name": "Ultra Boss/Ultra Tyndarius/Orbs-Generic.gbot",
-      "category": "Ultra Boss",
-      "description": "Ultra Boss bot: Orbs-Generic (Ultra Tyndarius).",
-      "sha256": "05869FE656D6ABAD16381A06310F38F136110C915B90E4D7EF2F0F9A616D4992"
-    },
-    {
       "name": "Ultra Boss/Eclipse/Maid/AP-Solstice-P2.json",
-      "category": "Ultra Boss (Maid)",
+      "credit": "jib-akbr",
       "description": "Maid configuration for AP-Solstice-P2.",
       "sha256": "A388DC0CF5919318DD1F6BE0BE3EA4D0484BA90587E79BAD63E897A035211716"
     },
     {
       "name": "Ultra Boss/Eclipse/Maid/Dungeon-Follower.json",
-      "category": "Ultra Boss (Maid)",
+      "credit": "jib-akbr",
       "description": "Maid configuration for Dungeon-Follower.",
       "sha256": "D22DD698803DFCE38816C683BF0363E885EAB4451603B9586C304426B2338644"
     },
     {
       "name": "Ultra Boss/Eclipse/Maid/LOO-Midnight-P1.json",
-      "category": "Ultra Boss (Maid)",
+      "credit": "jib-akbr",
       "description": "Maid configuration for LOO-Midnight-P1.",
       "sha256": "A4AD1C562BEAB9CAEE6E8658166474A0BA668605CCA561A7BC9B8C35177C7C3F"
     },
     {
       "name": "Ultra Boss/Eclipse/Maid/LR-Solstice-P1.json",
-      "category": "Ultra Boss (Maid)",
+      "credit": "jib-akbr",
       "description": "Maid configuration for LR-Solstice-P1.",
       "sha256": "202147C800706F05441CD5F8163FABFF661D2C08720C69F178AE0F2626BDB52D"
     },
     {
       "name": "Ultra Boss/Eclipse/Maid/SC-Midnight-P2.json",
-      "category": "Ultra Boss (Maid)",
+      "credit": "jib-akbr",
       "description": "Maid configuration for SC-Midnight-P2.",
       "sha256": "FE61262DF503FE39E38DCD6F3AC877CB95103C074CA4121D729A1D201E9CEAB1"
+    },
+    {
+      "name": "Ultra Boss/Eclipse/MidnightSun.gbot",
+      "credit": "jib-akbr",
+      "description": "Ultra Boss bot: MidnightSun (Eclipse).",
+      "sha256": "A4AE8593D5FF5E14EC0D0FFB62611AA0F52F9449087CB2D25E14BD431CCDCD8E"
+    },
+    {
+      "name": "Ultra Boss/Eclipse/SolsticeMoon.gbot",
+      "credit": "jib-akbr",
+      "description": "Ultra Boss bot: SolsticeMoon (Eclipse).",
+      "sha256": "781E739F7227376C8757E9E080354DE59DD576CEB8B0D019DC0506D29801BEDC"
+    },
+    {
+      "name": "Ultra Boss/Ultra Dage/All Class.gbot",
+      "credit": "jib-akbr",
+      "description": "Ultra Boss bot: All Class (Ultra Dage).",
+      "sha256": "6D86B20B3B4DEA55916655922CB00F236C66A5FDB1918FC03467A1CFDDD76551"
+    },
+    {
+      "name": "Ultra Boss/Ultra Darkon/class.txt",
+      "credit": "jib-akbr",
+      "description": "Class setup notes for class.",
+      "sha256": "F993301E5DB2A2BDDB67A3F883E4D8CAA456B7F5239DD3BBA4220360B3F91A24"
+    },
+    {
+      "name": "Ultra Boss/Ultra Darkon/General.gbot",
+      "credit": "jib-akbr",
+      "description": "Darkon quest farm bot: General.",
+      "sha256": "CC232D74F55F1DE50BC27E40BADB514F64309B0A3C646F12E00BC187C9AE179D"
+    },
+    {
+      "name": "Ultra Boss/Ultra Drago/Algie-First.gbot",
+      "credit": "jib-akbr",
+      "description": "Ultra Boss bot: Algie-First (Ultra Drago).",
+      "sha256": "4F1F6D270AA2C5E7B015A8E370369A9A6486E5F37D4681A3DE077533727A4770"
+    },
+    {
+      "name": "Ultra Boss/Ultra Drago/class.txt",
+      "credit": "jib-akbr",
+      "description": "Class setup notes for class.",
+      "sha256": "2FDFD0499FBD6E99E545C5772D3428AED14AFD2AABE7A030BF2519186F9CBDF7"
+    },
+    {
+      "name": "Ultra Boss/Ultra Drago/Dene-First-Taunt.gbot",
+      "credit": "jib-akbr",
+      "description": "Ultra Boss bot: Dene-First-Taunt (Ultra Drago).",
+      "sha256": "58CBD7309CC520FEB9E50F5596B9E40490E9C595AD472D8A2BA0A8590F6EDF94"
+    },
+    {
+      "name": "Ultra Boss/Ultra Nulgath/class.txt",
+      "credit": "jib-akbr",
+      "description": "Class setup notes for class.",
+      "sha256": "9B1E926E9214923FB1F3EABC6FD80EA707931FDBFFDC3DAFBC42BD257ADBCFC6"
+    },
+    {
+      "name": "Ultra Boss/Ultra Nulgath/Generic-Nulgath.gbot",
+      "credit": "jib-akbr",
+      "description": "Ultra Boss bot: Generic-Nulgath (Ultra Nulgath).",
+      "sha256": "D9A3D001FAE3A1DB8A9D9A0DF3114EE24F48C4CFF78BD540DA74E2427F9830F7"
+    },
+    {
+      "name": "Ultra Boss/Ultra Nulgath/Taunter-Nulgath.gbot",
+      "credit": "jib-akbr",
+      "description": "Ultra Boss bot: Taunter-Nulgath (Ultra Nulgath).",
+      "sha256": "1E38A3A3D36965A0B81F7DC828A7619CDF7A2F5737D5D1194CC57B1CF77390AD"
+    },
+    {
+      "name": "Ultra Boss/Ultra Timeinn/class.txt",
+      "credit": "jib-akbr",
+      "description": "Class setup notes for class.",
+      "sha256": "83A746DC57D3233342A94AAE110C6E20CD9072D53C203620EBA4B7E8EA34ABC1"
+    },
+    {
+      "name": "Ultra Boss/Ultra Timeinn/General-Timeinn.gbot",
+      "credit": "jib-akbr",
+      "description": "Ultra Boss bot: General-Timeinn (Ultra Timeinn).",
+      "sha256": "67AB562D4A9A1AA957DB17553E3BC10371E7665DFF8495AB0ED997C7C4E11095"
+    },
+    {
+      "name": "Ultra Boss/Ultra Tyndarius/Avatar-Taunter.gbot",
+      "credit": "jib-akbr",
+      "description": "Ultra Boss bot: Avatar-Taunter (Ultra Tyndarius).",
+      "sha256": "321CD9DEC3D58D1818CFDEBFA036630C6004C49B4ACB6831978F246573B6672D"
+    },
+    {
+      "name": "Ultra Boss/Ultra Tyndarius/class.txt",
+      "credit": "jib-akbr",
+      "description": "Class setup notes for class.",
+      "sha256": "CBCDE04CAB5EE472CD2471BFF2BB52D96ACDFD9E3B7E47486452190DD68988D5"
+    },
+    {
+      "name": "Ultra Boss/Ultra Tyndarius/Orbs-Generic.gbot",
+      "credit": "jib-akbr",
+      "description": "Ultra Boss bot: Orbs-Generic (Ultra Tyndarius).",
+      "sha256": "05869FE656D6ABAD16381A06310F38F136110C915B90E4D7EF2F0F9A616D4992"
     }
   ]
 }

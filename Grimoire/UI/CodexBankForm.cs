@@ -91,7 +91,7 @@ namespace Grimoire.UI
                 foreach (var script in manifest.Scripts)
                 {
                     ListViewItem lvi = new ListViewItem(script.Name);
-                    lvi.SubItems.Add(script.Category ?? "General");
+                    lvi.SubItems.Add(!string.IsNullOrWhiteSpace(script.Credit) ? script.Credit : "-");
                     
                     var statusSubItem = lvi.SubItems.Add(script.StatusDisplay);
                     lvi.SubItems.Add(script.Description ?? "");

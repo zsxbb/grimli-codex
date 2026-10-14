@@ -22,7 +22,7 @@ namespace Grimoire.UI
             this.btnCheckAppUpdate = new DarkUI.Controls.DarkButton();
             this.lvScripts = new System.Windows.Forms.ListView();
             this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colCategory = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colCredit = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colStatus = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colDescription = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lblStatus = new DarkUI.Controls.DarkLabel();
@@ -75,7 +75,7 @@ namespace Grimoire.UI
             this.lvScripts.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lvScripts.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colName,
-            this.colCategory,
+            this.colCredit,
             this.colStatus,
             this.colDescription});
             this.lvScripts.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
@@ -94,10 +94,10 @@ namespace Grimoire.UI
             this.colName.Text = "Script Name";
             this.colName.Width = 200;
             // 
-            // colCategory
+            // colCredit
             // 
-            this.colCategory.Text = "Category";
-            this.colCategory.Width = 90;
+            this.colCredit.Text = "Credit";
+            this.colCredit.Width = 90;
             // 
             // colStatus
             // 
@@ -208,7 +208,7 @@ namespace Grimoire.UI
         private DarkUI.Controls.DarkButton btnCheckAppUpdate;
         private System.Windows.Forms.ListView lvScripts;
         private System.Windows.Forms.ColumnHeader colName;
-        private System.Windows.Forms.ColumnHeader colCategory;
+        private System.Windows.Forms.ColumnHeader colCredit;
         private System.Windows.Forms.ColumnHeader colStatus;
         private System.Windows.Forms.ColumnHeader colDescription;
         private DarkUI.Controls.DarkLabel lblStatus;

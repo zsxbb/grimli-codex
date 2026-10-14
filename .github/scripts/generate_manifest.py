@@ -14,11 +14,13 @@ def main():
         print(f"Error: Directory not found: {codex_dir}")
         return
 
-    # Preserve top-level app metadata from existing manifest if present
-    app_version = "2.0"
+    # Preserve top-level app metadata and per-script metadata from existing manifest
+    app_version = "2.0.1"
     app_download_url = "https://github.com/zsxbb/grimli-codex/releases/latest/download/Grimoire.exe"
     app_release_url = "https://github.com/zsxbb/grimli-codex/releases/latest"
-    changelog = "Grimlite Li x CODEX v2.0 - Official release with integrated Codex Script Bank & cloud sync."
+    changelog = "Grimlite Li x CODEX v2.0.1 - Fixed update issue."
+    existing_credits = {}
+    existing_descriptions = {}
 
     if os.path.isfile(manifest_path):
         try:
@@ -28,6 +30,16 @@ def main():
                 app_download_url = old_data.get("app_download_url", app_download_url)
                 app_release_url = old_data.get("app_release_url", app_release_url)
                 changelog = old_data.get("changelog", changelog)
+
+                for item in old_data.get("scripts", []):
+                    name = item.get("name")
+                    if name:
+                        # Support reading from credit or legacy author
+                        credit_val = item.get("credit", item.get("author", ""))
+                        if credit_val:
+                            existing_credits[name] = credit_val
+                        if item.get("description"):
+                            existing_descriptions[name] = item.get("description")
         except Exception as e:
             print(f"Warning: Could not read existing manifest ({e}), using default metadata.")
 
@@ -63,31 +75,15 @@ def main():
 
             sha256 = hashlib.sha256(normalized).hexdigest().upper()
 
-            # Determine category based on directory structure
-            parts = rel_path.split("/")
-            category = "General"
-            if len(parts) == 1:
-                if "Dungeon" in f:
-                    category = "Dungeon"
-                elif "New World" in f:
-                    category = "Farming"
-            else:
-                top_folder = parts[0]
-                if top_folder == "LR":
-                    category = "Legion Revenant"
-                elif top_folder == "Ultra Boss":
-                    if "/Maid/" in rel_path:
-                        category = "Ultra Boss (Maid)"
-                    else:
-                        category = "Ultra Boss"
-                elif len(parts) > 2 and parts[1] == "Maid":
-                    category = f"{top_folder} (Maid)"
-                else:
-                    category = top_folder
+            # Determine credit (preserve from manifest, no hardcoded name)
+            credit = existing_credits.get(rel_path, "")
 
             # Determine description
             base_name, ext = os.path.splitext(f)
-            if rel_path in custom_descriptions:
+            parts = rel_path.split("/")
+            if rel_path in existing_descriptions:
+                desc = existing_descriptions[rel_path]
+            elif rel_path in custom_descriptions:
                 desc = custom_descriptions[rel_path]
             elif ext == ".json":
                 desc = f"Maid configuration for {base_name}."
@@ -107,13 +103,13 @@ def main():
 
             scripts.append({
                 "name": rel_path,
-                "category": category,
+                "credit": credit,
                 "description": desc,
                 "sha256": sha256
             })
 
-    # Sort scripts by category, then by name
-    scripts.sort(key=lambda s: (s["category"].lower(), s["name"].lower()))
+    # Sort scripts by relative path name
+    scripts.sort(key=lambda s: s["name"].lower())
 
     manifest = {
         "app_version": app_version,
