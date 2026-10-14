@@ -2,7 +2,7 @@
   "app_version": "2.1",
   "app_download_url": "https://github.com/zsxbb/grimli-codex/releases/latest/download/Grimoire.exe",
   "app_release_url": "https://github.com/zsxbb/grimli-codex/releases/latest",
-  "changelog": "Grimlite Li x CODEX v2.0 - Official release with integrated Codex Script Bank & cloud sync.",
+  "changelog": "Grimlite Li x CODEX v2.1 - Official release with integrated Codex Script Bank & cloud sync.",
   "scripts": [
     {
       "name": "AutoGrimDungeon.gbot",
