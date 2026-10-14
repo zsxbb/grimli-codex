@@ -215,7 +215,7 @@ namespace Grimoire.Tools
         {
             try
             {
-                CodexManifest manifest = CachedManifest ?? await FetchManifestAsync();
+                CodexManifest manifest = await FetchManifestAsync();
                 if (manifest == null)
                 {
                     MessageBox.Show("Failed to connect to GitHub to check for updates.", "Update Check", MessageBoxButtons.OK, MessageBoxIcon.Warning);
