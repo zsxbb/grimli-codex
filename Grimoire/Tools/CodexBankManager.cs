@@ -124,6 +124,8 @@ namespace Grimoire.Tools
             catch { }
         }
 
+        public event Action<bool> UpdateAvailabilityChanged;
+
         public async Task<CodexManifest> FetchManifestAsync()
         {
             using (HttpClient client = CreateHttpClient())
@@ -136,6 +138,11 @@ namespace Grimoire.Tools
                 {
                     CachedManifest = manifest;
                     RefreshLocalStatus(manifest);
+                    try
+                    {
+                        UpdateAvailabilityChanged?.Invoke(IsAppUpdateAvailable(manifest));
+                    }
+                    catch { }
                 }
 
                 return manifest;

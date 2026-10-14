@@ -155,6 +155,55 @@ namespace Grimoire.UI
                     catch { }
                 }
             });
+
+            // Highlight About & Update App in yellow if an update is available
+            CodexBankManager.Instance.UpdateAvailabilityChanged += isAvail =>
+            {
+                SetUpdateNotification(isAvail);
+            };
+
+            // Silent background update check loop (starts 4s after launch, checks every 30m)
+            Task.Run(async () =>
+            {
+                await Task.Delay(4000);
+                while (!this.IsDisposed)
+                {
+                    try
+                    {
+                        await CodexBankManager.Instance.FetchManifestAsync();
+                    }
+                    catch { }
+                    await Task.Delay(TimeSpan.FromMinutes(30));
+                }
+            });
+        }
+
+        public void SetUpdateNotification(bool available)
+        {
+            if (this.IsDisposed) return;
+
+            if (this.InvokeRequired)
+            {
+                try
+                {
+                    this.BeginInvoke(new Action(() => SetUpdateNotification(available)));
+                }
+                catch { }
+                return;
+            }
+
+            if (available)
+            {
+                Color highlight = Color.Gold;
+                aboutToolStripMenuItem.ForeColor = highlight;
+                updateAppMenuItem.ForeColor = highlight;
+            }
+            else
+            {
+                Color defaultColor = Color.FromArgb(220, 220, 220);
+                aboutToolStripMenuItem.ForeColor = defaultColor;
+                updateAppMenuItem.ForeColor = defaultColor;
+            }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
