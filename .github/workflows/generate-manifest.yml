@@ -1,0 +1,40 @@
+name: Auto Generate CodexBank Manifest
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'CodexBank/**'
+      - '!CodexBank/manifest.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate manifest.json
+        run: python .github/scripts/generate_manifest.py
+
+      - name: Commit and push updated manifest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CodexBank/manifest.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(codexbank): auto-generate manifest.json [skip ci]"
+            git push origin main
+          else
+            echo "No changes in manifest.json to commit."
+          fi
