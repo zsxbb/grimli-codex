@@ -1,6 +1,6 @@
 <div align="center">
 
-# Grimlite Li x CODEX v2.0
+# Grimlite Li x CODEX v2
 
 **Advanced Client Architecture, Network Packet Engine, Cloud Script Bank & Automation Suite for AdventureQuest Worlds**
 
