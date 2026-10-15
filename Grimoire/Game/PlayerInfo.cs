@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +9,31 @@ namespace Grimoire.Game
 {
     public class PlayerInfo
     {
+        private string _name;
+
         /// <summary>
         /// The name of the player.
         /// </summary>
         [JsonProperty("uoName")]
-        public string Name { get; set; }
+        public string Name
+        {
+            get => _name;
+            set => _name = value;
+        }
+
+        [JsonProperty("strUsername")]
+        public string StrUsername
+        {
+            get => _name;
+            set { if (!string.IsNullOrEmpty(value)) _name = value; }
+        }
+
+        [JsonProperty("unm")]
+        public string Unm
+        {
+            get => _name;
+            set { if (!string.IsNullOrEmpty(value)) _name = value; }
+        }
 
         /// <summary>
         /// The player's current HP.
@@ -83,7 +103,9 @@ namespace Grimoire.Game
 
         public override string ToString()
         {
-            return $"{EntID}: {Name}";
+            if (EntID > 0)
+                return $"{EntID}: {Name}";
+            return Name ?? "";
         }
     }
 }

@@ -123,3 +123,12 @@ Apakah masih bisa build di komputer lokal? **Tentu saja, keduanya saling melengk
 - **Build Manual via Web**: Anda juga dapat memicu workflow `release.yml` secara manual melalui tab **Actions** di GitHub repository dengan menekan tombol **Run workflow** (fitur `workflow_dispatch`).
 - **File Output**: Hanya file mandiri `Grimoire.exe` yang dirilis, tidak membutuhkan file zip terpisah sehingga mempermudah pengguna akhir dan sistem auto-update di dalam game.
 
+---
+
+## 📋 Riwayat Versi & Changelog
+
+### v2.0.3
+* **New Feature**: Search name .gbot script on bot manager
+* **Patch**: Tools Cosmetics SWF Grabber Updated
+
+

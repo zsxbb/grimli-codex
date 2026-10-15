@@ -99,15 +99,25 @@ if (Test-Path $scriptGenPath) {
     Write-Host "[OK] Updated generate_manifest.py default -> $CleanVer" -ForegroundColor Green
 }
 
+# 6. Update README.md (badges & intro)
+$readmePath = Join-Path $repoRoot "README.md"
+if (Test-Path $readmePath) {
+    $content = Get-Content $readmePath -Raw -Encoding UTF8
+    $content = $content -replace 'Release-v\d+\.\d+\.\d+_Stable', "Release-${TagVer}_Stable"
+    $content = $content -replace 'Grimlite Li x CODEX v\d+\.\d+\.\d+', "Grimlite Li x CODEX $TagVer"
+    Set-Content -Path $readmePath -Value $content -Encoding UTF8
+    Write-Host "[OK] Updated README.md -> $TagVer" -ForegroundColor Green
+}
+
 Write-Host ""
 Write-Host "Semua file versi berhasil disinkronkan!" -ForegroundColor Cyan
 
-# 6. Git Operations (Commit & Tag)
+# 7. Git Operations (Commit & Tag)
 $git = Get-Command git -ErrorAction SilentlyContinue
 if ($git) {
     Write-Host "Menyiapkan git commit & tag..." -ForegroundColor Yellow
     
-    & git add "$assemblyInfoPath" "$codexBankManagerPath" "$manifestPath" "$scriptGenPath"
+    & git add -A
     
     $commitMsg = "chore(release): bump version to $TagVer"
     if (-not [string]::IsNullOrWhiteSpace($Changelog)) {

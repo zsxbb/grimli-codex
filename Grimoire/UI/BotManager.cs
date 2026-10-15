@@ -30,6 +30,7 @@ using System.Diagnostics;
 using System.Text;
 using Grimoire.Networking.Handlers;
 using Grimoire.Utils;
+using System.Runtime.InteropServices;
 
 namespace Grimoire.UI
 {
@@ -43,6 +44,10 @@ namespace Grimoire.UI
 
         // Global handlers used while the bot is running
         public IJsonMessageHandler SpecialJsonHandler;
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, string lParam);
+        private const int EM_SETCUEBANNER = 0x1501;
         public IXtMessageHandler SpecialXtHandler;
 
         // Always-on handler to feed animation messages to Misc "Special Anims" statements
@@ -186,6 +191,11 @@ namespace Grimoire.UI
             if (font != null)
                 this.Font = new Font(font, 8.25f, FontStyle.Regular, GraphicsUnit.Point, 0);
             ApplyDpiScaling();
+            try
+            {
+                SendMessage(txtSearchBot.Handle, EM_SETCUEBANNER, 1, "Search bot...");
+            }
+            catch { }
         }
 
         public void ApplyDpiScaling(int? commandsSizeOverride = null)
@@ -454,8 +464,10 @@ namespace Grimoire.UI
                     lstItems.Items.Clear();
                     lstSoundItems.Items.Clear();
                 }
-                txtSavedAuthor.Text = config.Author ?? "Author";
-                txtSavedDesc.Text = DocConvert.IsBase64Encoded(config.Description) ? DocConvert.Unzip(config.Description) : config.Description ?? "Description";
+                string desc = DocConvert.IsBase64Encoded(config.Description) ? DocConvert.Unzip(config.Description) : config.Description ?? "Description";
+                txtSavedDesc.Text = !string.IsNullOrWhiteSpace(config.Author)
+                    ? $"Author: {config.Author}\r\n\r\n{desc}"
+                    : desc;
                 List<IBotCommand> commands = config.Commands;
                 if (commands != null && commands.Count > 0)
                 {
@@ -541,9 +553,12 @@ namespace Grimoire.UI
                 chkAFK.Checked = config.AFK;
                 chkAntiCounter.Checked = config.AntiCounter;
                 txtAuthor.Text = config.Author;
-                txtDescription.Text =
-                txtSavedDesc.Text = DocConvert.IsBase64Encoded(config.Description) ? DocConvert.Unzip(config.Description) : config.Description ?? "Description";
-                var description = txtSavedDesc.Text ?? "Description";
+                string rawDesc = DocConvert.IsBase64Encoded(config.Description) ? DocConvert.Unzip(config.Description) : config.Description ?? "Description";
+                txtDescription.Text = rawDesc;
+                txtSavedDesc.Text = !string.IsNullOrWhiteSpace(config.Author)
+                    ? $"Author: {config.Author}\r\n\r\n{rawDesc}"
+                    : rawDesc;
+                var description = rawDesc;
                 if (description.StartsWith("{\\rtf") || description.StartsWith("{\rtf"))
                     rtbInfo.Rtf = description; //mainTabControl.SelectedTab = tabInfo;
                 else
@@ -1584,15 +1599,101 @@ namespace Grimoire.UI
         {
             if (!string.IsNullOrEmpty(txtSaved.Text) && Directory.Exists(txtSaved.Text))
             {
+                if (!string.IsNullOrWhiteSpace(txtSearchBot?.Text))
+                {
+                    PerformBotSearch();
+                    return;
+                }
                 lblBots.Text = string.Format("Number of Bots: {0}", Directory.EnumerateFiles(txtSaved.Text, "*.gbot", SearchOption.AllDirectories).Count());
                 treeBots.Nodes.Clear();
                 AddTreeNodes(treeBots, txtSaved.Text);
             }
         }
 
+        private void txtSearchBot_TextChanged(object sender, EventArgs e)
+        {
+            PerformBotSearch();
+        }
+
+        private void txtSearchBot_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                txtSearchBot.Clear();
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+        }
+
+        private void PerformBotSearch()
+        {
+            if (string.IsNullOrEmpty(txtSaved.Text) || !Directory.Exists(txtSaved.Text))
+                return;
+
+            string query = txtSearchBot.Text.Trim();
+            if (string.IsNullOrEmpty(query))
+            {
+                lblBots.Text = string.Format("Number of Bots: {0}", Directory.EnumerateFiles(txtSaved.Text, "*.gbot", SearchOption.AllDirectories).Count());
+                treeBots.Nodes.Clear();
+                AddTreeNodes(treeBots, txtSaved.Text);
+                return;
+            }
+
+            string rootDir = txtSaved.Text;
+            string[] allFiles;
+            try
+            {
+                allFiles = Directory.GetFiles(rootDir, "*.gbot", SearchOption.AllDirectories);
+            }
+            catch
+            {
+                return;
+            }
+
+            string[] keywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            List<string> matches = new List<string>();
+            foreach (string file in allFiles)
+            {
+                string relPath = file.Substring(rootDir.Length).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                if (keywords.All(k => relPath.IndexOf(k, StringComparison.OrdinalIgnoreCase) >= 0))
+                {
+                    matches.Add(file);
+                }
+            }
+
+            lblBots.Text = $"Found: {matches.Count} of {allFiles.Length} bots";
+            treeBots.BeginUpdate();
+            try
+            {
+                treeBots.Nodes.Clear();
+                foreach (string file in matches)
+                {
+                    string relPath = file.Substring(rootDir.Length).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                    string relDir = Path.GetDirectoryName(relPath);
+                    string nodeText = string.IsNullOrEmpty(relDir)
+                        ? Path.GetFileName(file)
+                        : $"[{relDir}] {Path.GetFileName(file)}";
+
+                    TreeNode node = new TreeNode(nodeText)
+                    {
+                        Tag = file,
+                        ToolTipText = relPath
+                    };
+                    treeBots.Nodes.Add(node);
+                }
+            }
+            finally
+            {
+                treeBots.EndUpdate();
+            }
+        }
+
         private void treeBots_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            string path = Path.Combine(txtSaved.Text, e.Node.FullPath);
+            string path = (e.Node.Tag is string tagPath && File.Exists(tagPath))
+                ? tagPath
+                : Path.Combine(txtSaved.Text, e.Node.FullPath);
             if (File.Exists(path))
             {
                 if (ctrlpressed)

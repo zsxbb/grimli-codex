@@ -476,6 +476,7 @@
     <Compile Include="Grimoire\Networking\Handlers\HandlerSpecialAnims.cs" />
     <Compile Include="Grimoire\Networking\Handlers\HandlerUltraGramielTaunt.cs" />
     <Compile Include="Grimoire\Networking\Handlers\HandlerChat.cs" />
+    <Compile Include="Grimoire\Networking\Handlers\HandlerCosmetics.cs" />
     <Compile Include="Grimoire\Networking\Handlers\HandlerDropItem.cs" />
     <Compile Include="Grimoire\Networking\Handlers\HandlerGetDrop.cs" />
     <Compile Include="Grimoire\Networking\Handlers\HandlerGetQuests.cs" />

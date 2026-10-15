@@ -21,9 +21,10 @@ namespace Grimoire.Game
                 if (!string.IsNullOrEmpty(json) && json.StartsWith("{"))
                 {
                     var dict = JsonConvert.DeserializeObject<Dictionary<string, PlayerInfo>>(json);
-                    if (dict != null)
+                    if (dict != null && dict.Count > 0)
                     {
                         _players = dict;
+                        return;
                     }
                 }
             }
@@ -31,6 +32,104 @@ namespace Grimoire.Game
             {
                 // Ignore exceptions during deserialization to prevent UI thread crashes
             }
+
+            try
+            {
+                var dict = new Dictionary<string, PlayerInfo>(StringComparer.OrdinalIgnoreCase);
+                List<string> areaUsers = PlayersInMap;
+                if (areaUsers != null)
+                {
+                    foreach (string unm in areaUsers)
+                    {
+                        if (!string.IsNullOrWhiteSpace(unm))
+                            dict[unm.ToLower()] = new PlayerInfo { Name = unm.Trim() };
+                    }
+                }
+
+                int avatarCount = 0;
+                string lenStr = Flash.GetGameObject("world.avatars.length");
+                if (int.TryParse(lenStr, out int l))
+                    avatarCount = l;
+
+                for (int i = 0; i < avatarCount; i++)
+                {
+                    try
+                    {
+                        string uName = Flash.GetGameObject($"world.avatars.{i}.dataLeaf.strUsername")?.Replace("\"", "").Trim();
+                        if (!string.IsNullOrEmpty(uName) && !uName.Equals("null", StringComparison.OrdinalIgnoreCase) && !uName.Equals("undefined", StringComparison.OrdinalIgnoreCase))
+                        {
+                            int.TryParse(Flash.GetGameObject($"world.avatars.{i}.dataLeaf.entID"), out int eId);
+                            string key = uName.ToLower();
+                            if (dict.TryGetValue(key, out PlayerInfo existing))
+                            {
+                                if (eId > 0) existing.EntID = eId;
+                            }
+                            else
+                            {
+                                dict[key] = new PlayerInfo { Name = uName, EntID = eId };
+                            }
+                        }
+                    }
+                    catch { }
+                }
+
+                if (!string.IsNullOrEmpty(Player.Username))
+                {
+                    string myKey = Player.Username.ToLower();
+                    if (dict.TryGetValue(myKey, out PlayerInfo myP))
+                    {
+                        if (myP.EntID <= 0 && Player.UserID > 0)
+                            myP.EntID = Player.UserID;
+                    }
+                    else
+                    {
+                        dict[myKey] = new PlayerInfo
+                        {
+                            Name = Player.Username,
+                            EntID = Player.UserID > 0 ? Player.UserID : 0
+                        };
+                    }
+                }
+
+                if (dict.Count > 0)
+                {
+                    _players = dict;
+                }
+            }
+            catch { }
+        }
+
+        public static void UpdatePlayerFromData(string username, int uid, Newtonsoft.Json.Linq.JToken data)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(username))
+                    return;
+
+                string key = username.Trim().ToLower();
+                lock (_players)
+                {
+                    if (_players.TryGetValue(key, out PlayerInfo existing))
+                    {
+                        if (uid > 0) existing.EntID = uid;
+                        if (data?["intLevel"] != null) existing.Level = (int?)data["intLevel"] ?? existing.Level;
+                        if (data?["intHP"] != null) existing.HP = (int?)data["intHP"] ?? existing.HP;
+                        if (data?["intHPMax"] != null) existing.MaxHP = (int?)data["intHPMax"] ?? existing.MaxHP;
+                    }
+                    else
+                    {
+                        _players[key] = new PlayerInfo
+                        {
+                            Name = username.Trim(),
+                            EntID = uid,
+                            Level = (int?)data?["intLevel"] ?? 0,
+                            HP = (int?)data?["intHP"] ?? 0,
+                            MaxHP = (int?)data?["intHPMax"] ?? 0
+                        };
+                    }
+                }
+            }
+            catch { }
         }
 
         private static Dictionary<string, PlayerInfo> _players = new Dictionary<string, PlayerInfo>();

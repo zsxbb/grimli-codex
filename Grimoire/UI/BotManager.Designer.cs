@@ -128,7 +128,8 @@ namespace Grimoire.UI
 		private DarkLabel lblSkills;
 		private DarkLabel lblCommands;
 		private DarkLabel lblItems;
-		private DarkTextBox txtSavedAuthor;
+		private DarkTextBox txtSearchBot;
+		private DarkLabel lblSearch;
 		private DarkLabel lblBots;
 		private TreeView treeBots;
 		private DarkTextBox txtSavedAdd;
@@ -634,7 +635,8 @@ namespace Grimoire.UI
             this.lblSkills = new DarkUI.Controls.DarkLabel();
             this.lblCommands = new DarkUI.Controls.DarkLabel();
             this.lblItems = new DarkUI.Controls.DarkLabel();
-            this.txtSavedAuthor = new DarkUI.Controls.DarkTextBox();
+            this.txtSearchBot = new DarkUI.Controls.DarkTextBox();
+            this.lblSearch = new DarkUI.Controls.DarkLabel();
             this.lblBots = new DarkUI.Controls.DarkLabel();
             this.txtSavedAdd = new DarkUI.Controls.DarkTextBox();
             this.btnSavedAdd = new DarkUI.Controls.DarkButton();
@@ -5020,7 +5022,8 @@ namespace Grimoire.UI
             this.tabBots.Controls.Add(this.lblSkills);
             this.tabBots.Controls.Add(this.lblCommands);
             this.tabBots.Controls.Add(this.lblItems);
-            this.tabBots.Controls.Add(this.txtSavedAuthor);
+            this.tabBots.Controls.Add(this.lblSearch);
+            this.tabBots.Controls.Add(this.txtSearchBot);
             this.tabBots.Controls.Add(this.lblBots);
             this.tabBots.Controls.Add(this.txtSavedAdd);
             this.tabBots.Controls.Add(this.btnSavedAdd);
@@ -5045,6 +5048,7 @@ namespace Grimoire.UI
             this.treeBots.LineColor = System.Drawing.Color.DarkGray;
             this.treeBots.Location = new System.Drawing.Point(4, 27);
             this.treeBots.Name = "treeBots";
+            this.treeBots.ShowNodeToolTips = true;
             this.treeBots.Size = new System.Drawing.Size(335, 232);
             this.treeBots.TabIndex = 17;
             this.treeBots.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.treeBots_AfterExpand);
@@ -5146,15 +5150,26 @@ namespace Grimoire.UI
             this.lblItems.Text = "Items:";
             this.lblItems.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
-            // txtSavedAuthor
+            // lblSearch
             // 
-            this.txtSavedAuthor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSavedAuthor.Location = new System.Drawing.Point(345, 64);
-            this.txtSavedAuthor.Name = "txtSavedAuthor";
-            this.txtSavedAuthor.ReadOnly = true;
-            this.txtSavedAuthor.Size = new System.Drawing.Size(193, 20);
-            this.txtSavedAuthor.TabIndex = 19;
-            this.txtSavedAuthor.Text = "Author";
+            this.lblSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblSearch.AutoSize = true;
+            this.lblSearch.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
+            this.lblSearch.Location = new System.Drawing.Point(341, 67);
+            this.lblSearch.Name = "lblSearch";
+            this.lblSearch.Size = new System.Drawing.Size(41, 13);
+            this.lblSearch.TabIndex = 20;
+            this.lblSearch.Text = "Search";
+            // 
+            // txtSearchBot
+            // 
+            this.txtSearchBot.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtSearchBot.Location = new System.Drawing.Point(386, 64);
+            this.txtSearchBot.Name = "txtSearchBot";
+            this.txtSearchBot.Size = new System.Drawing.Size(152, 20);
+            this.txtSearchBot.TabIndex = 19;
+            this.txtSearchBot.TextChanged += new System.EventHandler(this.txtSearchBot_TextChanged);
+            this.txtSearchBot.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSearchBot_KeyDown);
             // 
             // lblBots
             // 

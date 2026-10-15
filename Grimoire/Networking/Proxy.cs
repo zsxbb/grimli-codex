@@ -267,6 +267,7 @@ namespace Grimoire.Networking
 
 		private readonly List<IJsonMessageHandler> _handlersJson = new List<IJsonMessageHandler>
 		{			
+			new HandlerCosmetics(),
 			new HandlerDropItem(),
 			new HandlerGetDrop(),
 			new HandlerGetQuests(),

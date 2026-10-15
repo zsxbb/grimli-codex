@@ -33,36 +33,294 @@ namespace Grimoire.UI
             txtCape1.TextChanged += (s, e) => AutoFillLinkFromTextBox(txtCape1, txtCape2);
             txtOff1.TextChanged += (s, e) => AutoFillLinkFromTextBox(txtOff1, txtOff2);
             txtMisc1.TextChanged += (s, e) => AutoFillLinkFromTextBox(txtMisc1, txtMisc2);
+
+            this.VisibleChanged += (s, e) =>
+            {
+                if (this.Visible)
+                    RefreshPlayers();
+            };
+            cbPlayer.DropDown += (s, e) => RefreshPlayers();
+        }
+
+        private PlayerInfo GetSelectedPlayer()
+        {
+            if (cbPlayer.SelectedItem is PlayerInfo pi && !string.IsNullOrWhiteSpace(pi.Name))
+                return pi;
+
+            string txt = cbPlayer.Text?.Trim();
+            if (!string.IsNullOrEmpty(txt))
+            {
+                int entId = 0;
+                string name = txt;
+                if (txt.Contains(":"))
+                {
+                    string[] parts = txt.Split(':');
+                    int.TryParse(parts[0].Trim(), out entId);
+                    name = parts[1].Trim();
+                }
+
+                return new PlayerInfo { Name = name, EntID = entId };
+            }
+
+            return null;
+        }
+
+        public void RefreshPlayers()
+        {
+            if (!Player.IsLoggedIn)
+                return;
+
+            string prevSelectedName = null;
+            if (cbPlayer.SelectedItem is PlayerInfo pi && !string.IsNullOrWhiteSpace(pi.Name))
+                prevSelectedName = pi.Name;
+            else if (!string.IsNullOrWhiteSpace(cbPlayer.Text))
+            {
+                string txt = cbPlayer.Text.Trim();
+                if (txt.Contains(":"))
+                    txt = txt.Substring(txt.IndexOf(':') + 1).Trim();
+                prevSelectedName = txt;
+            }
+
+            Dictionary<string, PlayerInfo> playersMap = new Dictionary<string, PlayerInfo>(StringComparer.OrdinalIgnoreCase);
+
+            // 1. Try World.PlayersInMap (areaUsers in Flash - always returns room players)
+            try
+            {
+                List<string> areaUsers = World.PlayersInMap;
+                if (areaUsers != null)
+                {
+                    foreach (string user in areaUsers)
+                    {
+                        if (!string.IsNullOrWhiteSpace(user) && !playersMap.ContainsKey(user))
+                        {
+                            playersMap[user] = new PlayerInfo { Name = user.Trim(), EntID = 0 };
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            // 2. Query world.avatars array (to enrich with entID and find cell avatars)
+            try
+            {
+                int avatarCount = 0;
+                string lenStr = Flash.GetGameObject("world.avatars.length");
+                if (int.TryParse(lenStr, out int l))
+                    avatarCount = l;
+
+                for (int i = 0; i < avatarCount; i++)
+                {
+                    try
+                    {
+                        string uName = Flash.GetGameObject($"world.avatars.{i}.dataLeaf.strUsername")?.Replace("\"", "").Trim();
+                        if (!string.IsNullOrEmpty(uName) && !uName.Equals("null", StringComparison.OrdinalIgnoreCase) && !uName.Equals("undefined", StringComparison.OrdinalIgnoreCase))
+                        {
+                            int.TryParse(Flash.GetGameObject($"world.avatars.{i}.dataLeaf.entID"), out int eId);
+                            if (playersMap.TryGetValue(uName, out PlayerInfo existing))
+                            {
+                                if (eId > 0) existing.EntID = eId;
+                            }
+                            else
+                            {
+                                playersMap[uName] = new PlayerInfo { Name = uName, EntID = eId };
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+
+            // 3. Try World.RefreshDictionary / World.Players
+            try
+            {
+                World.RefreshDictionary();
+                var worldPlayers = World.Players;
+                if (worldPlayers != null)
+                {
+                    foreach (var p in worldPlayers)
+                    {
+                        if (p != null && !string.IsNullOrWhiteSpace(p.Name))
+                        {
+                            if (playersMap.TryGetValue(p.Name, out PlayerInfo existing))
+                            {
+                                if (existing.EntID <= 0 && p.EntID > 0) existing.EntID = p.EntID;
+                            }
+                            else
+                            {
+                                playersMap[p.Name] = p;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            // 4. Ensure current player is included
+            if (!string.IsNullOrEmpty(Player.Username))
+            {
+                if (playersMap.TryGetValue(Player.Username, out PlayerInfo myP))
+                {
+                    if (myP.EntID <= 0 && Player.UserID > 0)
+                        myP.EntID = Player.UserID;
+                }
+                else
+                {
+                    playersMap[Player.Username] = new PlayerInfo
+                    {
+                        Name = Player.Username,
+                        EntID = Player.UserID > 0 ? Player.UserID : 0
+                    };
+                }
+            }
+
+            // 5. Ensure targeted player is included
+            try
+            {
+                string targetName = Flash.GetGameObject("world.myAvatar.target.dataLeaf.strUsername")?.Replace("\"", "").Trim();
+                if (!string.IsNullOrEmpty(targetName) && !targetName.Equals("null", StringComparison.OrdinalIgnoreCase) && !targetName.Equals("undefined", StringComparison.OrdinalIgnoreCase))
+                {
+                    int.TryParse(Flash.GetGameObject("world.myAvatar.target.dataLeaf.entID"), out int targetEntID);
+                    if (playersMap.TryGetValue(targetName, out PlayerInfo targetP))
+                    {
+                        if (targetP.EntID <= 0 && targetEntID > 0) targetP.EntID = targetEntID;
+                    }
+                    else
+                    {
+                        playersMap[targetName] = new PlayerInfo { Name = targetName, EntID = targetEntID };
+                    }
+                }
+            }
+            catch { }
+
+            cbPlayer.BeginUpdate();
+            try
+            {
+                cbPlayer.Items.Clear();
+
+                string currentUsername = Player.Username ?? "";
+                string currentTarget = "";
+                try
+                {
+                    currentTarget = Flash.GetGameObject("world.myAvatar.target.dataLeaf.strUsername")?.Replace("\"", "").Trim() ?? "";
+                }
+                catch { }
+
+                var sortedList = playersMap.Values
+                    .OrderByDescending(p => p.Name.Equals(currentUsername, StringComparison.OrdinalIgnoreCase))
+                    .ThenByDescending(p => !string.IsNullOrEmpty(currentTarget) && p.Name.Equals(currentTarget, StringComparison.OrdinalIgnoreCase))
+                    .ThenBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                if (sortedList.Count > 0)
+                {
+                    cbPlayer.Items.AddRange(sortedList.ToArray());
+
+                    int selectIdx = -1;
+                    if (!string.IsNullOrEmpty(prevSelectedName))
+                    {
+                        selectIdx = sortedList.FindIndex(p => p.Name.Equals(prevSelectedName, StringComparison.OrdinalIgnoreCase));
+                    }
+
+                    if (selectIdx == -1 && !string.IsNullOrEmpty(currentTarget))
+                    {
+                        selectIdx = sortedList.FindIndex(p => p.Name.Equals(currentTarget, StringComparison.OrdinalIgnoreCase));
+                    }
+
+                    if (selectIdx == -1 && !string.IsNullOrEmpty(currentUsername))
+                    {
+                        selectIdx = sortedList.FindIndex(p => p.Name.Equals(currentUsername, StringComparison.OrdinalIgnoreCase));
+                    }
+
+                    cbPlayer.SelectedIndex = selectIdx > -1 ? selectIdx : 0;
+                }
+            }
+            finally
+            {
+                cbPlayer.EndUpdate();
+            }
         }
 
         private void lnkRefresh_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            if (!Player.IsLoggedIn)
-                return;
-            cbPlayer.Items.Clear();
-            World.RefreshDictionary();
-            cbPlayer.Items.AddRange(World.Players.ToArray());
-            cbPlayer.SelectedItem = cbPlayer.Items.Count > 0 ? cbPlayer.Items[0] : null;
+            RefreshPlayers();
         }
 
         private void btnGrabCosm_Click(object sender, EventArgs e)
         {
-            if (cbPlayer.SelectedIndex > -1)
+            PlayerInfo player = GetSelectedPlayer();
+            if (player == null)
+            {
+                RefreshPlayers();
+                player = GetSelectedPlayer();
+            }
+
+            List<CosmeticEquipment> equips = CosmeticEquipment.Get(player);
+            if (equips != null && equips.Count > 0)
+            {
                 try
                 {
-                    try
-                    {
-                        if (lbItems.Items[lbItems.Items.Count - 1].ToString() != " ")
-                            lbItems.Items.Add(" ");
-                    }
-                    catch { }
-                    lbItems.Items.AddRange(CosmeticEquipment.Get(((PlayerInfo)cbPlayer.SelectedItem).EntID).ToArray());
-                    lbItems.Items.Add(" ");
+                    if (lbItems.Items.Count > 0 && lbItems.Items[lbItems.Items.Count - 1].ToString() != " ")
+                        lbItems.Items.Add(" ");
                 }
-                catch
-                {
+                catch { }
 
+                lbItems.Items.AddRange(equips.ToArray());
+                lbItems.Items.Add(" ");
+
+                txtHelm1.Text = ""; txtHelm2.Text = "";
+                txtArmor1.Text = ""; txtArmor2.Text = "";
+                txtClass1.Text = ""; txtClass2.Text = "";
+                txtWeapon1.Text = ""; txtWeapon2.Text = "";
+                txtOff1.Text = ""; txtOff2.Text = "";
+                txtPet1.Text = ""; txtPet2.Text = "";
+                txtCape1.Text = ""; txtCape2.Text = "";
+                txtMisc1.Text = ""; txtMisc2.Text = "";
+
+                foreach (var eq in equips)
+                {
+                    switch (eq.Slot)
+                    {
+                        case EquipType.Helm:
+                            txtHelm1.Text = eq.SWFFile;
+                            txtHelm2.Text = eq.Link;
+                            break;
+                        case EquipType.Armor:
+                            txtArmor1.Text = eq.SWFFile;
+                            txtArmor2.Text = eq.Link;
+                            break;
+                        case EquipType.Class:
+                            txtClass1.Text = eq.SWFFile;
+                            txtClass2.Text = eq.Link;
+                            break;
+                        case EquipType.Weapon:
+                            txtWeapon1.Text = eq.SWFFile;
+                            txtWeapon2.Text = eq.Link;
+                            break;
+                        case EquipType.Offhand:
+                            txtOff1.Text = eq.SWFFile;
+                            txtOff2.Text = eq.Link;
+                            break;
+                        case EquipType.Pet:
+                            txtPet1.Text = eq.SWFFile;
+                            txtPet2.Text = eq.Link;
+                            break;
+                        case EquipType.Cape:
+                            txtCape1.Text = eq.SWFFile;
+                            txtCape2.Text = eq.Link;
+                            break;
+                        case EquipType.Ground:
+                            txtMisc1.Text = eq.SWFFile;
+                            txtMisc2.Text = eq.Link;
+                            break;
+                    }
                 }
+            }
+            else
+            {
+                string targetName = player?.Name ?? cbPlayer.Text;
+                lbItems.Items.Add($"[Notice] Data for {targetName} not received yet. Target them in-game or wait a moment and click Grab again.");
+            }
         }
 
         private void btnCopyAll_Click(object sender, EventArgs e)
@@ -97,12 +355,7 @@ namespace Grimoire.UI
 
         private void btnRefresh_Click(object sender, EventArgs e)
         {
-            if (!Player.IsLoggedIn)
-                return;
-            cbPlayer.Items.Clear();
-            World.RefreshDictionary();
-            cbPlayer.Items.AddRange(World.Players.ToArray());
-            cbPlayer.SelectedItem = cbPlayer.Items.Count > 0 ? cbPlayer.Items[0] : null;
+            RefreshPlayers();
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -133,53 +386,62 @@ namespace Grimoire.UI
 
         private void linkItems_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            if (cbPlayer.SelectedIndex > -1)
-                try
+            PlayerInfo player = GetSelectedPlayer();
+            if (player == null)
+            {
+                RefreshPlayers();
+                player = GetSelectedPlayer();
+            }
+
+            List<CosmeticEquipment> equips = CosmeticEquipment.Get(player);
+            if (equips == null || equips.Count == 0)
+                return;
+
+            string lbl = ((LinkLabel)sender).Text.Split(' ')[1].Replace("Wep", "Weapon");
+            object[] array = equips.ToArray();
+            for (int num = 0; array.Length > num; num++)
+            {
+                if (array[num].ToString().StartsWith(lbl))
                 {
-                    string lbl = ((LinkLabel)sender).Text.Split(' ')[1].Replace("Wep", "Weapon");
-                    object[] array = CosmeticEquipment.Get(((PlayerInfo)cbPlayer.SelectedItem).EntID).ToArray();
-                    for (int num = 0; array.Length > num; num++)
-                        if (array[num].ToString().StartsWith(lbl))
-                        {
-                            lbItems.Items.Add(array[num]);
-                            string[] i = array[num].ToString().Replace($"{lbl}: ", "").Split(';');
-                            if (lbl == "Cape" && txtCape1.Text != (txtCape1.Text.NullIfEmpty() ?? i[0]))
-                            {
-                                txtCape1.Text = i[0];
-                                txtCape2.Text = i[1];
-                            }
-                            else if (lbl == "Class" && txtClass1.Text != (txtClass1.Text.NullIfEmpty() ?? i[0]))
-                            {
-                                txtClass1.Text = i[0];
-                                txtClass2.Text = i[1];
-                            }
-                            else if (lbl == "Pet" && txtPet2.Text != (txtPet1.Text.NullIfEmpty() ?? i[0]))
-                            {
-                                txtPet1.Text = i[0];
-                                txtPet2.Text = i[1];
-                            }
-                            else if (lbl == "Weapon" && txtWeapon1.Text != (txtWeapon1.Text.NullIfEmpty() ?? i[0]))
-                            {
-                                txtWeapon1.Text = i[0];
-                                txtWeapon2.Text = i[1];
-                            }
-                            else if (lbl == "Helm" && txtHelm1.Text != (txtHelm1.Text.NullIfEmpty() ?? i[0]))
-                            {
-                                txtHelm1.Text = i[0];
-                                txtHelm2.Text = i[1];
-                            }
-                            else if (lbl == "Armor" && txtArmor1.Text != (txtArmor1.Text.NullIfEmpty() ?? i[0]))
-                            {
-                                txtArmor1.Text = i[0];
-                                txtArmor2.Text = i[1];
-                            }
-                            else if (lbl == "Ground" && txtMisc1.Text != (txtMisc1.Text.NullIfEmpty() ?? i[0]))
-                            {
-                                txtMisc1.Text = i[0];
-                                txtMisc2.Text = i[1];
-                            }
-                        }
-                }catch{}
+                    lbItems.Items.Add(array[num]);
+                    string[] i = array[num].ToString().Replace($"{lbl}: ", "").Split(';');
+                    if (lbl == "Cape")
+                    {
+                        txtCape1.Text = i[0];
+                        txtCape2.Text = i[1];
+                    }
+                    else if (lbl == "Class")
+                    {
+                        txtClass1.Text = i[0];
+                        txtClass2.Text = i[1];
+                    }
+                    else if (lbl == "Pet")
+                    {
+                        txtPet1.Text = i[0];
+                        txtPet2.Text = i[1];
+                    }
+                    else if (lbl == "Weapon")
+                    {
+                        txtWeapon1.Text = i[0];
+                        txtWeapon2.Text = i[1];
+                    }
+                    else if (lbl == "Helm")
+                    {
+                        txtHelm1.Text = i[0];
+                        txtHelm2.Text = i[1];
+                    }
+                    else if (lbl == "Armor")
+                    {
+                        txtArmor1.Text = i[0];
+                        txtArmor2.Text = i[1];
+                    }
+                    else if (lbl == "Ground")
+                    {
+                        txtMisc1.Text = i[0];
+                        txtMisc2.Text = i[1];
+                    }
+                }
+            }
         }
 
         private void lbItems_KeyDown(object sender, KeyEventArgs e)
