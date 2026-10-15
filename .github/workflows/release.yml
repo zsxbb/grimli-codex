@@ -1,0 +1,55 @@
+name: Build and Release Grimoire
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Publish Release
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+
+      - name: Restore NuGet Packages
+        run: nuget restore "Project Grimlite.sln"
+
+      - name: Build Solution (Release x86)
+        run: |
+          msbuild "Project Grimlite.sln" /p:Configuration=Release /p:Platform=x86 /p:RestorePackages=false /m
+
+      - name: Verify Output Executable
+        shell: pwsh
+        run: |
+          $exePath = "bin/x86/Release/Grimoire.exe"
+          if (-not (Test-Path $exePath)) {
+            Write-Error "Grimoire.exe was not found at $exePath!"
+            exit 1
+          }
+          $item = Get-Item $exePath
+          Write-Host "Success: Found Grimoire.exe ($([math]::Round($item.Length / 1MB, 2)) MB)"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: bin/x86/Release/Grimoire.exe
+          name: Grimlite Li x CODEX ${{ github.ref_name }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
