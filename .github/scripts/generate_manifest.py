@@ -18,8 +18,7 @@ def main():
     app_version = "2.0.3"
     app_download_url = "https://github.com/zsxbb/grimli-codex/releases/latest/download/Grimoire.exe"
     app_release_url = "https://github.com/zsxbb/grimli-codex/releases/latest"
-    changelog = "Grimlite Li x CODEX v2.0.3 - * New Feature: Search name .gbot script on bot manager
-* Patch: Tools Cosmetics SWF Grabber Updated"
+    changelog = "Grimlite Li x CODEX v2.0.3 - New Feature: Search name .gbot script on bot manager, Patch: Tools Cosmetics SWF Grabber Updated"
     existing_credits = {}
     existing_descriptions = {}
 
