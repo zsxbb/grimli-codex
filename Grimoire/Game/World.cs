@@ -99,6 +99,9 @@ namespace Grimoire.Game
             catch { }
         }
 
+        private static readonly object _playersLock = new object();
+        private static Dictionary<string, PlayerInfo> _players = new Dictionary<string, PlayerInfo>(StringComparer.OrdinalIgnoreCase);
+
         public static void UpdatePlayerFromData(string username, int uid, Newtonsoft.Json.Linq.JToken data)
         {
             try
@@ -107,7 +110,7 @@ namespace Grimoire.Game
                     return;
 
                 string key = username.Trim().ToLower();
-                lock (_players)
+                lock (_playersLock)
                 {
                     if (_players.TryGetValue(key, out PlayerInfo existing))
                     {
@@ -132,11 +135,19 @@ namespace Grimoire.Game
             catch { }
         }
 
-        private static Dictionary<string, PlayerInfo> _players = new Dictionary<string, PlayerInfo>();
         /// <summary>
         /// Gets a list of all players in the current map.
         /// </summary>
-        public static List<PlayerInfo> Players => _players != null ? _players.Values.ToList() : new List<PlayerInfo>();
+        public static List<PlayerInfo> Players
+        {
+            get
+            {
+                lock (_playersLock)
+                {
+                    return _players != null ? _players.Values.ToList() : new List<PlayerInfo>();
+                }
+            }
+        }
 
         public static List<ShopInfo> LoadedShops;
 

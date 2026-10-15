@@ -159,42 +159,22 @@ namespace Grimoire.Botting
             if (!string.IsNullOrEmpty(username))
             {
                 string lower = username.Trim().ToLower();
+                string[] paths = { $"world.uoTree.{lower}.eqp", $"world.uoTree.{lower}.data.eqp", $"world.uoTree.{lower}.objData.eqp" };
 
-                try
+                foreach (string p in paths)
                 {
-                    string uoEqp = Flash.GetGameObject($"world.uoTree.{lower}.eqp");
-                    var list = ParseEquips(uoEqp);
-                    if (list.Count > 0)
+                    try
                     {
-                        StoreInCache(username, list);
-                        return list;
+                        string uoEqp = Flash.GetGameObject(p);
+                        var list = ParseEquips(uoEqp);
+                        if (list.Count > 0)
+                        {
+                            StoreInCache(username, list);
+                            return list;
+                        }
                     }
+                    catch { }
                 }
-                catch { }
-
-                try
-                {
-                    string uoEqp = Flash.GetGameObject($"world.uoTree.{lower}.data.eqp");
-                    var list = ParseEquips(uoEqp);
-                    if (list.Count > 0)
-                    {
-                        StoreInCache(username, list);
-                        return list;
-                    }
-                }
-                catch { }
-
-                try
-                {
-                    string uoEqp = Flash.GetGameObject($"world.uoTree.{lower}.objData.eqp");
-                    var list = ParseEquips(uoEqp);
-                    if (list.Count > 0)
-                    {
-                        StoreInCache(username, list);
-                        return list;
-                    }
-                }
-                catch { }
             }
 
             if (id > 0)

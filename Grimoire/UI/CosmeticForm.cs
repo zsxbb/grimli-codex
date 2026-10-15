@@ -326,9 +326,9 @@ namespace Grimoire.UI
         private void btnCopyAll_Click(object sender, EventArgs e)
         {
             try
-			{
-                lbItems.Items.Cast<CosmeticEquipment>().ForEach(x => x.Equip());
-            } 
+            {
+                lbItems.Items.OfType<CosmeticEquipment>().ForEach(x => x.Equip());
+            }
             catch { }
         }
 
@@ -336,12 +336,9 @@ namespace Grimoire.UI
         {
             try
             {
-                lbItems.SelectedItems.Cast<CosmeticEquipment>().ForEach(x => x.Equip());
+                lbItems.SelectedItems.OfType<CosmeticEquipment>().ForEach(x => x.Equip());
             }
-            catch
-            {
-
-            }
+            catch { }
         }
 
         private void CosmeticForm_FormClosing(object sender, FormClosingEventArgs e)
