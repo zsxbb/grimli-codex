@@ -8,7 +8,7 @@ Folder `.github` ini berisi seluruh konfigurasi otomatisasi CI/CD (**GitHub Acti
 
 ```
 .github/
-├── README.md                      # Dokumentasi ini
+├── WORKFLOWS.md                   # Dokumentasi ini
 ├── workflows/
 │   ├── release.yml                # Otomatisasi Build & Publikasi Release Grimoire.exe
 │   └── generate-manifest.yml      # Otomatisasi pembuatan katalog CodexBank/manifest.json

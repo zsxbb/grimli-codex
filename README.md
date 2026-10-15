@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 # Grimlite Li x CODEX v2
 
@@ -47,6 +47,7 @@
 - [⌨️ Daftar Pintasan Keyboard (Hotkeys)](#️-daftar-pintasan-keyboard-hotkeys)
 - [💻 Kompilasi dari Source Code](#-kompilasi-dari-source-code)
 - [🌐 Deployment Signaling Server (Voice Chat)](#-deployment-signaling-server-voice-chat)
+- [📋 Riwayat Versi & Catatan Perubahan (Changelog)](#-riwayat-versi--catatan-perubahan-changelog)
 - [❓ Tanya Jawab & Solusi Kendala (FAQ)](#-tanya-jawab--solusi-kendala-faq)
 - [⚖️ Batasan Tanggung Jawab (Disclaimer)](#️-batasan-tanggung-jawab-disclaimer)
 
@@ -435,6 +436,14 @@ pm2 start server.js --name "grimcodex-voice"
 pm2 save
 pm2 startup
 ```
+
+---
+
+## 📋 Riwayat Versi & Catatan Perubahan (Changelog)
+
+### v2.0.3
+* **New Feature**: Search name `.gbot` script on Bot Manager secara real-time.
+* **Patch**: Tools Cosmetics SWF Grabber di-update (menangkap packet `initUserDatas` / `initUserData` langsung dari server untuk mengambil data equipment player lain tanpa tertukar).
 
 ---
 
