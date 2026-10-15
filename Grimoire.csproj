@@ -760,15 +760,9 @@
     <Content Include="Loader\grimoire.swf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\astolfo_head.png" />
-    <None Include="Resources\Dropbox.png" />
-    <None Include="Resources\astolfo.jpg" />
-    <None Include="Resources\Discord.ico" />
     <None Include="Resources\Artix.ico" />
     <None Include="Resources\defaulttext.txt" />
     <None Include="Resources\statementcmds.txt" />
-    <None Include="Resources\MPGHfavicon16.png" />
-    <None Include="Resources\MPGHfavicon.png" />
     <None Include="Resources\GrimoireIconBig.png" />
     <Content Include="Resources\GitHub.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

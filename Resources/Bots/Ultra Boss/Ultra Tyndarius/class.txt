@@ -1,2 +1,0 @@
-Avatar-Taunter.gbot	-> LOO + Enrage
-Orbs-Generic.gbot	-> CAV/SC/SWOT, LOO, LR
