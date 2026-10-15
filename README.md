@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 # Grimlite Li x CODEX v2
 
@@ -467,4 +467,5 @@ Aktifkan opsi **Safe Delay** dan naikkan **Relog Delay** di Tab Options menjadi 
 ## ⚖️ Batasan Tanggung Jawab (Disclaimer)
 
 *Perangkat lunak ini dikembangkan semata-mata untuk tujuan edukasi, riset protokol jaringan, dan studi arsitektur rekayasa perangkat lunak non-komersial. Pengembang tidak bertanggung jawab atas segala bentuk penyalahgunaan aplikasi yang bertentangan dengan ketentuan layanan pihak penyedia game terkait.*
+
 

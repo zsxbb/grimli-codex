@@ -139,7 +139,7 @@ if ($git) {
     if ($Push) {
         Write-Host "Mendorong commit & tag ke GitHub (origin)..." -ForegroundColor Yellow
         & git push origin HEAD
-        & git push origin "$TagVer"
+        & git push origin "$TagVer" --force
         Write-Host ""
         Write-Host "================================================================" -ForegroundColor Green
         Write-Host " SUKSES! Tag $TagVer terkirim ke GitHub.                         " -ForegroundColor Green
@@ -151,7 +151,7 @@ if ($git) {
         Write-Host "Commit dan Tag lokal ($TagVer) sudah siap!" -ForegroundColor Yellow
         Write-Host "Untuk memicu auto-release di GitHub, jalankan:" -ForegroundColor White
         Write-Host "  git push origin HEAD" -ForegroundColor Gray
-        Write-Host "  git push origin $TagVer" -ForegroundColor Gray
+        Write-Host "  git push origin $TagVer --force" -ForegroundColor Gray
         Write-Host "(atau jalankan ulang script dengan parameter -Push)" -ForegroundColor Gray
     }
 } else {

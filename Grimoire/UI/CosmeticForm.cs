@@ -33,13 +33,6 @@ namespace Grimoire.UI
             txtCape1.TextChanged += (s, e) => AutoFillLinkFromTextBox(txtCape1, txtCape2);
             txtOff1.TextChanged += (s, e) => AutoFillLinkFromTextBox(txtOff1, txtOff2);
             txtMisc1.TextChanged += (s, e) => AutoFillLinkFromTextBox(txtMisc1, txtMisc2);
-
-            this.VisibleChanged += (s, e) =>
-            {
-                if (this.Visible)
-                    RefreshPlayers();
-            };
-            cbPlayer.DropDown += (s, e) => RefreshPlayers();
         }
 
         private PlayerInfo GetSelectedPlayer()
@@ -251,8 +244,8 @@ namespace Grimoire.UI
             PlayerInfo player = GetSelectedPlayer();
             if (player == null)
             {
-                RefreshPlayers();
-                player = GetSelectedPlayer();
+                lbItems.Items.Add("[Notice] Please click Refresh first to detect players in the room.");
+                return;
             }
 
             List<CosmeticEquipment> equips = CosmeticEquipment.Get(player);
@@ -386,8 +379,8 @@ namespace Grimoire.UI
             PlayerInfo player = GetSelectedPlayer();
             if (player == null)
             {
-                RefreshPlayers();
-                player = GetSelectedPlayer();
+                lbItems.Items.Add("[Notice] Please click Refresh first to detect players in the room.");
+                return;
             }
 
             List<CosmeticEquipment> equips = CosmeticEquipment.Get(player);
