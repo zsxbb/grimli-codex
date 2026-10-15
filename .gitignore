@@ -15,6 +15,7 @@ FodyWeavers.xsd
 
 ## Scratch / Temp
 scratch/
+grimoire-swf/
 *.tmp
 *.log
 *.bak
