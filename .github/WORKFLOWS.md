@@ -127,6 +127,11 @@ Apakah masih bisa build di komputer lokal? **Tentu saja, keduanya saling melengk
 
 ## 📋 Riwayat Versi & Changelog
 
+### v2.0.5
+* **New Feature (Skill Moments)**: Active Rules checkbox selection (aktifkan/nonaktifkan rule secara selektif dengan centang tanpa harus menghapus).
+* **New Feature (Loop Taunt)**: Pengganti Loop Aura dengan sistem built-in Taunt 1 & Taunt 2 (siklus rotasi 5 detik, opening manual untuk Taunt 1, anti-stop watchdog 10.5 detik).
+* **Note**: Update: CODEX features: Skill Moment Choose Rules, Loop Taunt.
+
 ### v2.0.3
 * **New Feature**: Search name .gbot script on bot manager
 * **Patch**: Tools Cosmetics SWF Grabber Updated

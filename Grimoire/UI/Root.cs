@@ -110,7 +110,7 @@ namespace Grimoire.UI
         [DllImport("kernel32.dll", EntryPoint = "SetProcessWorkingSetSize")]
         private static extern int SetProcessWorkingSetSize(IntPtr process, int minimumWorkingSetSize, int maximumWorkingSetSize);
 
-        private string title = $"Grimlite Li x CODEX v2";
+        private string title = $"Grimlite Li x CODEX v{CodexBankManager.CURRENT_APP_VERSION}";
 
         public Root()
         {
@@ -1359,7 +1359,7 @@ namespace Grimoire.UI
             this.loopEnrageMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
             this.loopEnrageMenuItem.Name = "loopEnrageMenuItem";
             this.loopEnrageMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.loopEnrageMenuItem.Text = "Loop Aura";
+            this.loopEnrageMenuItem.Text = "Loop Taunt";
             this.loopEnrageMenuItem.Click += new System.EventHandler(this.loopEnrageMenuItem_Click);
 
             // 

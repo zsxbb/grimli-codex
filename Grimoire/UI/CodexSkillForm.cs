@@ -125,11 +125,19 @@ namespace Grimoire.UI
             };
 
             _rules.Add(rule);
-            lstRules.Items.Add(rule);
+            lstRules.Items.Add(rule, true);
 
             // Reset inputs
             txtKeyword.Clear();
             txtDelay.Text = "0";
+        }
+
+        private void lstRules_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            if (e.Index >= 0 && e.Index < _rules.Count)
+            {
+                _rules[e.Index].IsEnabled = (e.NewValue == CheckState.Checked);
+            }
         }
 
         private void btnRemoveRule_Click(object sender, EventArgs e)
@@ -162,6 +170,10 @@ namespace Grimoire.UI
                 {
                     try
                     {
+                        for (int i = 0; i < _rules.Count && i < lstRules.Items.Count; i++)
+                        {
+                            _rules[i].IsEnabled = lstRules.GetItemChecked(i);
+                        }
                         File.WriteAllText(saveFileDialog.FileName, JsonConvert.SerializeObject(_rules, Formatting.Indented));
                         MessageBox.Show("Rules saved successfully!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -197,7 +209,7 @@ namespace Grimoire.UI
                             lstRules.Items.Clear();
                             foreach (var rule in _rules)
                             {
-                                lstRules.Items.Add(rule);
+                                lstRules.Items.Add(rule, rule.IsEnabled);
                             }
                             MessageBox.Show("Rules loaded successfully!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
@@ -258,6 +270,8 @@ namespace Grimoire.UI
 
                     foreach (var rule in _rules)
                     {
+                        if (!rule.IsEnabled) continue;
+
                         if (rule.TriggerType == "By HP Monster")
                         {
                             if (rule.LastTargetName != currentTargetKey)
@@ -408,6 +422,8 @@ namespace Grimoire.UI
 
                             foreach (var rule in _rules)
                             {
+                                if (!rule.IsEnabled) continue;
+
                                 string triggerType = rule.TriggerType ?? "By Message";
                                 if (triggerType != "By Message") continue;
 
@@ -448,6 +464,7 @@ namespace Grimoire.UI
 
     public class SkillMomentRule
     {
+        public bool IsEnabled { get; set; } = true;
         public string TriggerType { get; set; }
         public string Keyword { get; set; }
         public string Skill1 { get; set; }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using DarkUI.Forms;
 using Grimoire.Game;
+using Grimoire.Tools;
 
 namespace Grimoire.UI
 {
@@ -14,8 +15,8 @@ namespace Grimoire.UI
 		public AboutForm()
 		{
 			InitializeComponent();
-			this.appName.Text = "Grimlite Li x CODEX v2";
-			this.lblVersion.Text = $"version 2 ({Program.ReleaseDate}) x CODEX";
+			this.appName.Text = $"Grimlite Li x CODEX v{CodexBankManager.CURRENT_APP_VERSION}";
+			this.lblVersion.Text = $"v{CodexBankManager.CURRENT_APP_VERSION} ({Program.ReleaseDate}) x CODEX";
 		}
 
 		private void AboutForm_FormClosing(object sender, FormClosingEventArgs e)

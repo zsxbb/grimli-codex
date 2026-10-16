@@ -15,8 +15,24 @@ namespace Grimoire.UI
     {
         public static CodexEnrageForm Instance { get; } = new CodexEnrageForm();
 
-        private DateTime _focusAppliedTime = DateTime.MinValue;
-        private bool _hasCastEnrage = false;
+        private const string TauntSkill = "5";
+        private const string TargetAura = "Focus";
+        private const double TriggerSeconds = 5.0;
+        private const double WatchdogSeconds = 10.5;
+
+        private enum TauntState
+        {
+            Idle,
+            WaitingForManualStart,
+            WaitingForPartner,
+            CountingDown,
+            Casting
+        }
+
+        private TauntState _state = TauntState.Idle;
+        private DateTime _turnStartTime = DateTime.MinValue;
+        private DateTime _lastMyCastTime = DateTime.MinValue;
+        private bool _isCasting = false;
 
         private CodexEnrageForm()
         {
@@ -26,21 +42,53 @@ namespace Grimoire.UI
 
         private void CodexEnrageForm_Load(object sender, EventArgs e)
         {
-            cmbSkill.SelectedIndex = 4; // Default to Skill 5
+            // Initial load
+        }
+
+        private void rbTaunt_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkEnableLoopEnrage.Checked)
+            {
+                ResetCycle();
+            }
         }
 
         private void chkEnableLoopEnrage_CheckedChanged(object sender, EventArgs e)
         {
-            Flash.FlashCall2 -= LoopEnragePacketHandler;
+            Flash.FlashCall2 -= LoopTauntPacketHandler;
             if (chkEnableLoopEnrage.Checked)
             {
-                _focusAppliedTime = DateTime.MinValue;
-                _hasCastEnrage = false;
-                Flash.FlashCall2 += LoopEnragePacketHandler;
+                ResetCycle();
+                Flash.FlashCall2 += LoopTauntPacketHandler;
+            }
+            else
+            {
+                _state = TauntState.Idle;
+                lblStatus.Text = "Status: Idle";
             }
         }
 
-        private void LoopEnragePacketHandler(string function, params object[] args)
+        private void ResetCycle()
+        {
+            _turnStartTime = DateTime.MinValue;
+            _lastMyCastTime = DateTime.MinValue;
+            _isCasting = false;
+
+            if (rbTaunt1.Checked)
+            {
+                // Taunt 1: Manual trigger by user the first time
+                _state = TauntState.WaitingForManualStart;
+                lblStatus.Text = "Status: Opening: Trigger Manual";
+            }
+            else
+            {
+                // Taunt 2: Passive wait for Taunt 1's Focus
+                _state = TauntState.WaitingForPartner;
+                lblStatus.Text = "Status: Waiting for Taunt 1...";
+            }
+        }
+
+        private void LoopTauntPacketHandler(string function, params object[] args)
         {
             if (function != "packetFromServer" || !chkEnableLoopEnrage.Checked) return;
             try
@@ -60,33 +108,37 @@ namespace Grimoire.UI
                         foreach (JObject action in actions)
                         {
                             string cmd = action["cmd"]?.ToString();
-                            if (cmd == "aura+")
+                            if (cmd == "aura+" || cmd == "auraUpdate")
                             {
-                                JArray auras = (JArray)action["auras"];
-                                if (auras != null)
+                                bool focusFound = false;
+
+                                // Check multiple auras array
+                                if (action["auras"] is JArray auras)
                                 {
                                     foreach (JObject aura in auras)
                                     {
                                         string name = aura["nam"]?.ToString();
-                                        if (string.Equals(name, txtAuraName.Text.Trim(), StringComparison.OrdinalIgnoreCase))
+                                        if (string.Equals(name, TargetAura, StringComparison.OrdinalIgnoreCase))
                                         {
-                                            _focusAppliedTime = DateTime.Now;
-                                            _hasCastEnrage = false;
+                                            focusFound = true;
+                                            break;
                                         }
                                     }
                                 }
-                            }
-                            else if (cmd == "aura-")
-                            {
-                                JObject aura = (JObject)action["aura"];
-                                if (aura != null)
+
+                                // Check single aura object
+                                if (!focusFound && action["aura"] is JObject singleAura)
                                 {
-                                    string name = aura["nam"]?.ToString();
-                                    if (string.Equals(name, txtAuraName.Text.Trim(), StringComparison.OrdinalIgnoreCase))
+                                    string name = singleAura["nam"]?.ToString();
+                                    if (string.Equals(name, TargetAura, StringComparison.OrdinalIgnoreCase))
                                     {
-                                        _focusAppliedTime = DateTime.MinValue;
-                                        _hasCastEnrage = false;
+                                        focusFound = true;
                                     }
+                                }
+
+                                if (focusFound)
+                                {
+                                    OnFocusDetected();
                                 }
                             }
                         }
@@ -96,19 +148,47 @@ namespace Grimoire.UI
             catch { }
         }
 
+        private void OnFocusDetected()
+        {
+            DateTime now = DateTime.UtcNow;
+
+            // 1. If Taunt 1 is waiting for the user's manual opening cast
+            if (_state == TauntState.WaitingForManualStart)
+            {
+                // User just casted manual opening! Focus is now on the boss.
+                _lastMyCastTime = now;
+                _state = TauntState.WaitingForPartner;
+                lblStatus.Text = "Status: Partner's Turn (Waiting Taunt 2)...";
+                return;
+            }
+
+            // 2. If we just casted within the last 2.0s, this packet is our own Focus confirmation
+            if (_lastMyCastTime != DateTime.MinValue && (now - _lastMyCastTime).TotalSeconds < 2.0)
+            {
+                _state = TauntState.WaitingForPartner;
+                return;
+            }
+
+            // 3. Partner casted Focus!
+            if (_state == TauntState.WaitingForPartner || _state == TauntState.Idle)
+            {
+                _turnStartTime = now;
+                _state = TauntState.CountingDown;
+            }
+        }
+
         private void timerUpdate_Tick(object sender, EventArgs e)
         {
             if (!Player.IsAlive)
             {
-                _focusAppliedTime = DateTime.MinValue;
-                _hasCastEnrage = false;
-                lblStatus.Text = "Status: Dead (Reset)";
+                lblStatus.Text = "Status: Dead (Waiting respawn)";
                 lblCurrentTarget.Text = "Target: None";
                 return;
             }
 
             string rawTargetName = Player.GetTargetName;
-            if (string.IsNullOrEmpty(rawTargetName) || rawTargetName == "null")
+            bool hasTarget = !string.IsNullOrEmpty(rawTargetName) && rawTargetName != "null";
+            if (!hasTarget)
             {
                 lblCurrentTarget.Text = "Target: None";
             }
@@ -117,61 +197,115 @@ namespace Grimoire.UI
                 lblCurrentTarget.Text = "Target: " + rawTargetName.Replace("\"", "");
             }
 
-            if (chkEnableLoopEnrage.Checked && _focusAppliedTime != DateTime.MinValue)
-            {
-                double elapsed = (DateTime.Now - _focusAppliedTime).TotalSeconds;
-                double triggerSec = (double)numTriggerSeconds.Value;
+            if (!chkEnableLoopEnrage.Checked) return;
 
-                if (!_hasCastEnrage)
+            DateTime now = DateTime.UtcNow;
+
+            // 1. Manual Opening phase for Taunt 1
+            if (_state == TauntState.WaitingForManualStart)
+            {
+                lblStatus.Text = "Status: Opening: Trigger Manual";
+                return;
+            }
+
+            // 2. Countdown phase: Counting 5 seconds from partner's Focus
+            if (_state == TauntState.CountingDown)
+            {
+                double elapsed = (now - _turnStartTime).TotalSeconds;
+                if (elapsed < TriggerSeconds)
                 {
-                    lblStatus.Text = $"Status: Active ({elapsed:F1}s)";
-                    if (elapsed >= triggerSec)
-                    {
-                        string skillToUse = cmbSkill.SelectedItem?.ToString() ?? "5";
-                        TriggerLoopEnrage(skillToUse);
-                    }
+                    double remain = Math.Max(0, TriggerSeconds - elapsed);
+                    lblStatus.Text = $"Status: Taunt in {remain:F1}s";
                 }
                 else
                 {
-                    lblStatus.Text = $"Status: Triggered ({elapsed:F1}s)";
+                    _state = TauntState.Casting;
+                    lblStatus.Text = "Status: Casting Taunt!";
+                    _ = TriggerTauntCast();
+                }
+                return;
+            }
+
+            // 3. Waiting for Partner phase (+ Anti-stop Watchdog safety)
+            if (_state == TauntState.WaitingForPartner)
+            {
+                if (_lastMyCastTime == DateTime.MinValue)
+                {
+                    lblStatus.Text = "Status: Waiting for Taunt 1...";
+                }
+                else
+                {
+                    double timeSinceMyCast = (now - _lastMyCastTime).TotalSeconds;
+                    string partnerLabel = rbTaunt1.Checked ? "Taunt 2" : "Taunt 1";
+                    lblStatus.Text = $"Status: Partner's Turn ({timeSinceMyCast:F1}s)";
+
+                    // Anti-Stop Watchdog: If 10.5 seconds pass and partner missed taunt (lag/dc),
+                    // emergency cast to save the team and keep cycle alive!
+                    if (timeSinceMyCast >= WatchdogSeconds && !_isCasting)
+                    {
+                        _state = TauntState.Casting;
+                        lblStatus.Text = "Status: Watchdog Emergency Taunt!";
+                        _ = TriggerTauntCast();
+                    }
                 }
             }
-            else
-            {
-                lblStatus.Text = "Status: Idle";
-            }
         }
 
-        private async void TriggerLoopEnrage(string skillToUse)
+        private async Task TriggerTauntCast()
         {
-            _hasCastEnrage = true;
-            bool success = await ExecuteSkillWithWait(skillToUse);
-            if (!success && chkEnableLoopEnrage.Checked && _focusAppliedTime != DateTime.MinValue && Player.IsAlive)
+            if (_isCasting) return;
+            _isCasting = true;
+
+            try
             {
-                _hasCastEnrage = false;
+                bool success = await ExecuteSkillWithRetry(TauntSkill);
+                _lastMyCastTime = DateTime.UtcNow;
+                _state = TauntState.WaitingForPartner;
+            }
+            finally
+            {
+                _isCasting = false;
             }
         }
 
-        private async Task<bool> ExecuteSkillWithWait(string index)
+        private async Task<bool> ExecuteSkillWithRetry(string index)
         {
             try
             {
                 if (!Player.IsAlive) return false;
-                int cd = Player.SkillAvailable(index);
-                await Task.Delay(Math.Min(cd, 1500));
-                if (!Player.IsAlive) return false;
-                Player.ForceUseSkill(index);
-                for (int i = 0; i < 10; i++)
+
+                // Ensure monster is targeted
+                string target = Player.GetTargetName;
+                if (string.IsNullOrEmpty(target) || target == "null")
                 {
+                    try
+                    {
+                        Flash.Call("AttackMonster", "*");
+                    }
+                    catch { }
                     await Task.Delay(100);
-                    if (!Player.IsAlive) return false;
-                    if (Player.SkillAvailable(index) > 0)
-                        return true;
                 }
-                Player.ForceUseSkill(index);
-                await Task.Delay(100);
-                if (Player.SkillAvailable(index) > 0)
-                    return true;
+
+                // Check cooldown and wait if small
+                int cd = Player.SkillAvailable(index);
+                if (cd > 0 && cd < 1200)
+                {
+                    await Task.Delay(cd);
+                }
+
+                // Cast and verify cooldown
+                for (int i = 0; i < 6; i++)
+                {
+                    if (!Player.IsAlive || !chkEnableLoopEnrage.Checked) return false;
+
+                    Player.ForceUseSkill(index);
+                    await Task.Delay(120);
+
+                    if (Player.SkillAvailable(index) > 0)
+                    {
+                        return true;
+                    }
+                }
             }
             catch { }
             return false;

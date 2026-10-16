@@ -41,7 +41,7 @@ namespace Grimoire.UI
             this.btnSaveRules = new DarkUI.Controls.DarkButton();
             this.btnLoadRules = new DarkUI.Controls.DarkButton();
             this.gbRulesList = new DarkUI.Controls.DarkGroupBox();
-            this.lstRules = new System.Windows.Forms.ListBox();
+            this.lstRules = new System.Windows.Forms.CheckedListBox();
             this.timerUpdate = new System.Windows.Forms.Timer(this.components);
 
             this.gbRulesList.SuspendLayout();
@@ -274,10 +274,12 @@ namespace Grimoire.UI
             this.lstRules.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
             this.lstRules.FormattingEnabled = true;
             this.lstRules.HorizontalScrollbar = true;
+            this.lstRules.CheckOnClick = true;
             this.lstRules.Location = new System.Drawing.Point(6, 18);
             this.lstRules.Name = "lstRules";
             this.lstRules.Size = new System.Drawing.Size(188, 170);
             this.lstRules.TabIndex = 0;
+            this.lstRules.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.lstRules_ItemCheck);
 
             // 
             // timerUpdate
@@ -351,7 +353,7 @@ namespace Grimoire.UI
         private DarkUI.Controls.DarkButton btnSaveRules;
         private DarkUI.Controls.DarkButton btnLoadRules;
         private DarkUI.Controls.DarkGroupBox gbRulesList;
-        private System.Windows.Forms.ListBox lstRules;
+        private System.Windows.Forms.CheckedListBox lstRules;
         private System.Windows.Forms.Timer timerUpdate;
     }
 }
