@@ -1,0 +1,321 @@
+﻿using Grimoire.Botting.Commands.Map;
+using Grimoire.Game.Data;
+using Grimoire.Game;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Grimoire.UI;
+using System;
+using System.Linq;
+using Grimoire.Networking;
+using System.Threading;
+
+namespace Grimoire.Botting.Commands.Combat
+{
+    class CmdQuestHunt : IBotCommand
+    {
+        public string Map { get; set; }
+        public string Cell { get; set; }
+        public string Pad { get; set; }
+        public string Monster { get; set; }
+        public string ItemName { get; set; }
+        public string Quantity { get; set; }
+        public int QID { get; set; } = 0;
+        public int maxcell { get; set; } = 10;
+        public bool BlankFirst { get; set; } = false;
+
+        public async Task Execute(IBotEngine instance)
+        {
+            string[] items = instance.ResolveVars(ItemName).Split(',');
+            string[] monsters = instance.ResolveVars(Monster).Split(',');
+            string[] quantities = instance.ResolveVars(Quantity).Split(',');
+            bool doQuest = QID != 0;
+            #region quest-based hunt
+            req = null;
+            if (doQuest)
+            {
+
+                if (!Player.Quests.HasQuest(QID))
+                {
+                    Player.Quests.Load(QID);
+                    await instance.WaitUntil(() => Player.Quests.HasQuest(QID),interval:200);
+                }
+
+                Game.Data.Quest quest = Player.Quests.Quest(QID);
+                int progress = Player.Quests.progress((int)quest.ISlot);
+                //int.Parse(Flash.CallGameFunction2("world.getQuestValue", quest.ISlot));
+
+                //Checks if the quest require questchains
+                if (progress >= quest.IValue && quest.ISlot > 0 && quest.IsNotRepeatable)
+                    return;
+
+                if (!quest.IsInProgress)
+                {
+                    quest.Accept();
+                    await instance.WaitUntil(() => quest.IsInProgress, timeout: 3);
+                }
+				else
+					quest.GhostAccept();
+                var reqs = quest.RequiredItems;
+                if (items.Length < reqs.Count)
+                    Array.Resize(ref items, reqs.Count);
+                if (monsters.Length < reqs.Count)
+                    Array.Resize(ref monsters, reqs.Count);
+
+                for (int i = 0; i < reqs.Count && Player.IsAlive && instance.IsRunning; i++)
+                {
+                    string name = reqs[i].Name;
+                    string qty = reqs[i].Quantity.ToString();
+                    req = reqs[i];
+
+                    if (items[i] == null)
+                        items[i] = "";
+
+                    if (itemCollected(name, qty))
+                        continue;
+
+                    LogForm.Instance.devDebug($"Name = {name} | Qty = {qty}");
+                    // if (!Player.Map.Equals(Map.Split('-')[0].ToLower()))
+                    await joinmap(Map, instance);
+
+                    if (int.TryParse(items[i], out int mapitemid))
+                        await getMap(mapitemid, qty);
+                    else
+                        await hunt(name, qty, 
+					string.IsNullOrWhiteSpace(monsters[i]) ? "*" : monsters[i], 
+					instance);
+                }
+				await Task.Delay(500);
+                if (quest.CanComplete){
+                    quest.Complete();
+					await instance.WaitUntil(() => !quest.IsInProgress, interval: 600, timeout:5);
+				}
+                return;
+            }
+            #endregion
+            #region non-quest
+            for (int i = 0; i < items.Length && instance.IsRunning; i++)
+            {
+                string qty = i < quantities.Length ? quantities[i] : "1";
+                string monster = i < monsters.Length ? monsters[i] : "*";
+
+                if (itemCollected(items[i], qty))
+                    continue;
+
+                //LogForm.Instance.devDebug($"Name = {name} | Qty = {qty}");
+                await joinmap(Map, instance);
+                // if (!Player.Map.Equals(Map.Split('-')[0].ToLower()))
+                if (int.TryParse(items[i], out int mapitemid))
+                    await getMap(mapitemid, qty);
+                else
+                    await hunt(items[i], qty, monster, instance);
+
+                // await Task.Delay(600);
+            }
+            #endregion
+        }
+        private static InventoryItem req = null; //used only for doQuest 
+        async Task hunt(string item, string qty, string target, IBotEngine instance)
+        {
+            List<string> targetCell = World.GetMonsterCells(target);
+
+            int _maxcell;
+            if (targetCell.Count >= maxcell)
+                _maxcell = maxcell;
+            else
+                _maxcell = targetCell.Count;
+
+            string[] _monsters = new string[] { "*" };
+            if (target != "*")
+                _monsters = target
+                        .Split('&')
+                        .Select(t => t.Trim())
+                        .ToArray();
+
+            CmdKill kill = new CmdKill
+            {
+                Monster = target,
+            };
+            CancellationTokenSource cts = new CancellationTokenSource();
+            _ = Task.Run(async () =>
+            {
+                while (instance.IsRunning && Player.IsLoggedIn && Player.IsAlive && !itemCollected(item, qty))
+                    await Task.Delay(500);
+                cts?.Cancel();
+                //LogForm.Instance.devDebug($"Cts Canceled");
+            });
+            if (targetCell.Count > 0 && _maxcell > 0)
+            {
+                int i = 0;
+                while (!cts.Token.IsCancellationRequested)
+                {
+                    //LogForm.Instance.devDebug("is it bugging??");
+                    //Variable is reused but it doesnt matter, im just lazy to create a new one
+                    if (World.MonstersAvailable(_monsters, out target))
+                    {
+                        kill.Monster = target;
+                        Player.AttackMonster(target);
+                        await kill.Execute(instance, cts.Token);
+                        continue;
+                    }
+                    if (Player.Cell != targetCell[i])
+                    {
+                        Player.MoveToCell(targetCell[i], "Left");
+                        LogForm.Instance.AppendDebug($"Cell : {targetCell[i]} [{i + 1}/{_maxcell}]");
+                    }
+                    await instance.WaitUntil(() => World.IsMonsterAvailable("*"), interval: 50);
+                    if (++i >= _maxcell)
+                        i = 0;
+                }
+            }
+			else
+			{
+				Player.MoveToCell(Cell, Pad);
+				while (!cts.Token.IsCancellationRequested)
+                {
+					await kill.Execute(instance, cts.Token);
+				}
+			}
+            cts?.Dispose();
+        }
+
+        async Task getMap(int mapitemid, string sqty)
+        {
+			if (Player.Cell != "Cut1") {
+				Player.MoveToCell("Cut1", "Left");
+				await Task.Delay(300);
+				if (!World.Cells.Contains("Cut1")) {
+					Player.MoveToCell("Enter", "Spawn");
+					await Task.Delay(300);
+					Player.MoveToCell("Enter", "Spawn");
+				}
+			}
+
+            int qty = int.Parse(sqty);
+
+            for (int i = -4; i < qty; i++) //extra 4 attempt for getting map anticipating failure
+            {
+                await Proxy.Instance.SendToServer($"%xt%zm%getMapItem%1%{mapitemid}%");
+                await Task.Delay(1100); 
+				//increased delay 600 >> 1100 due to server limit rate
+
+                if (!Player.recentMapItem.TryGetValue(mapitemid, out string itemName))
+                    continue;
+                itemName = itemName.Split('(')[0].Trim(); 
+                //Split in here is used for cutting logged mapitem with following format :
+                //"mapItemName (mapname)"
+                if (itemCollected(itemName, sqty))
+                    break;
+            }
+        }
+
+        bool itemCollected(string id, string qty)
+        {
+
+            if (req != null) //Handles quest.reqs item
+                return itemCollected(req);
+
+            return Player.TempInventory.ContainsItem(id, qty)
+                || Player.Inventory.ContainsItem(id, qty);
+        }
+        bool itemCollected(InventoryItem item)
+        {
+            //Finds containsItem but with item.id instead of Name
+            //Cuz some quest may have same itemName, this is useful for Bulk GhostAccepted quests
+            if (item.IsTemporary)
+                return Player.TempInventory.ContainsItem(item);
+            return Player.Inventory.ContainsItem(item);
+        }
+
+        /*List<string> GetMonsterCells(string monsterName)
+        {
+            List<Monster> monMap = World.GetAllMonsters();
+
+            //1. Collect all monster, then ordered by most amount within a cell
+            if (monsterName == "*")
+            {
+                return monMap
+                    .Where(m => !string.IsNullOrEmpty(m.cell))
+                    .GroupBy(m => m.cell, StringComparer.OrdinalIgnoreCase)
+                    .OrderByDescending(g => g.Count())
+                    .Select(g => g.Key)
+                    .ToList();
+            }
+
+            // Logical OR filtering
+            Func<Monster, bool> finalPredicate = m => false;
+
+            // Filtering with MonId
+            Match match = Regex.Match(monsterName, @"^id['.:-](?<Id>\d+)$", RegexOptions.IgnoreCase);
+            if (match.Success && int.TryParse(match.Groups["Id"].Value, out int targetId))
+            {
+                //filter with ID when matched with "id." format
+                finalPredicate = m => m.MonMapID == targetId;
+            }
+            else //otherwise filter with name contains 
+            {
+                finalPredicate = m => m.Name.IndexOf(monsterName, StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+
+            //2. Collect monsters that contains its name
+            List<string> targetCells = monMap
+                .Where(finalPredicate)
+                .GroupBy(m => m.cell, StringComparer.OrdinalIgnoreCase)
+                .OrderByDescending(g => g.Count()) // cell with most monster 
+                .Select(g => g.Key)
+                .ToList();
+            return targetCells;
+        }*/
+
+        async Task joinmap(string map, IBotEngine instance)
+        {
+            CmdJoin join = new CmdJoin
+            {
+                Map = map,
+                Cell = Cell,
+                Pad = Pad,
+                Try = 3
+            };
+            await join.ExecuteSkipCell(instance);
+        }
+
+        public override string ToString()
+        {
+            string[] items = ItemName.Split(',');
+            string[] quantities = Quantity.Split(',');
+            string[] monsters = Monster.Split(',');
+            List<string> _parts = new List<string>();
+            if (QID != 0)
+            {
+                int _maxlen = Math.Max(items.Length, monsters.Length);
+                for (int i = 0; i < _maxlen; i++)
+                {
+                    string item= (i < items.Length) ? items[i].Trim() : "";
+                    string mob = (i < monsters.Length) ? monsters[i].Trim() : "";
+
+                    if (string.IsNullOrEmpty(item) && string.IsNullOrEmpty(mob))
+                    {
+                        _parts.Add("Blank");
+                        continue;
+                    }
+
+                    if (!string.IsNullOrEmpty(item))
+                        _parts.Add(item);
+                    else if (!string.IsNullOrEmpty(mob))
+                        _parts.Add($"{mob}*");
+                }
+                return $"Quest-{QID} items:{string.Join(" | ", _parts)}";
+            }
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                //parts += $"{i + 1}-{items[i]} x{quantities[i]} [{monsters[i]}]";if (items.Length < reqs.Count)
+                string mon = (i < monsters.Length) ? monsters[i] : "1";
+                string qty = (i < quantities.Length) ? quantities[i] : "*" ;
+                _parts.Add($"{items[i]} [{mon}] x{qty}");
+                //This thing is really fragile SMH
+            }
+            return $"Hunt : {string.Join(" | ", _parts)}";
+        }
+
+    }
+}

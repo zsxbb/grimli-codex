@@ -1,0 +1,56 @@
+using Grimoire.Botting;
+using Grimoire.UI;
+using System.Windows.Forms;
+
+namespace Grimoire.Tools
+{
+	public static class ClientConfig
+	{
+		public static Config Config = Config.Load(Application.StartupPath + "\\ClientConfig.cfg");
+		public const string C_SKILL_PRESET_PREFIX = "SS.";
+		public const string C_BOTS_DIR = "botsDir";
+		public const string C_FLASH = "flash";
+		public const string C_LOG_DEBUG_SWF = "logDebugSwf";
+		public const string C_SAFE_CELL = "safeCell";
+		public const string C_QUEST_LIST_DELAY = "questListDelay";
+		public const string C_ACCESS_LEVEL = "accessLevel";
+		public const string C_NAME_COLOR = "nameColor";
+		public const string C_FPS = "fps";
+		public const string C_WMODE = "wmode";
+		public const string C_QUALITY = "quality";
+		public static bool AutoCorrect => BotManager.Instance.chkCorrection.Checked;
+		public static bool ProtectFavorites
+		{
+			get
+			{
+				string val = GetValue("protectFavorites");
+				return val == null || val.Equals("true", System.StringComparison.OrdinalIgnoreCase);
+			}
+			set
+			{
+				SetValue("protectFavorites", value.ToString().ToLower());
+			}
+		}
+		//public const string C_REPLACESKILLONLOAD = "replaceSkillOnLoadCmd";
+
+		public static string GetValue(string key)
+		{
+			string value;
+			try
+			{
+				value = Config.Get(key);
+			}
+			catch
+			{
+				value = null;
+			}
+			return value;
+		}
+
+		public static void SetValue(string key, string value)
+		{
+			Config.Set(key, value);
+			Config.Save();
+		}
+	}
+}

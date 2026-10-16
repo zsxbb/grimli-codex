@@ -1,0 +1,120 @@
+using Grimoire.Botting;
+using Grimoire.Tools;
+using Grimoire.UI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web.Caching;
+
+namespace Grimoire.Game.Data
+{
+    public class Bank
+    {
+        public List<InventoryItem> Items => Flash.Call<List<InventoryItem>>("GetBankItems", new string[0]);
+        Dictionary<int, InventoryItem> _cache = new Dictionary<int, InventoryItem>();
+        public Dictionary<int, InventoryItem> Cache
+        {
+            get
+            {
+                var _items = Items;
+                //_cache = new Dictionary<int, InventoryItem>(_items.Count);
+                foreach (var item in _items)
+                {
+                    _cache[item.Id] = item;
+                }
+                return _cache;
+            }
+        }
+        public InventoryItem GetItemByName(string name)
+        {
+            return Flash.Call<InventoryItem>("GetBankItemByName", name);
+        }
+
+        public int AvailableSlots => TotalSlots - UsedSlots;
+
+        public int UsedSlots => Flash.Call<int>("UsedBankSlots", new string[0]);
+
+        public int TotalSlots => Flash.Call<int>("BankSlots", new string[0]);
+
+        public void TransferToBank(string itemName)
+        {
+            var item = Player.Inventory.GetItemByName(itemName);
+            if (item != null && !Player.Inventory.CanBank(item))
+            {
+                LogForm.Instance.devDebug($"[CanBank] Blocked banking Class '{item.Name}' (prohibited by game inventory category rules).");
+                return;
+            }
+            Flash.Call("TransferToBank", itemName);
+        }
+
+        public void TransferFromBank(string itemName) => Flash.Call("TransferToInventory", itemName);
+
+        public void Swap(string invItemName, string bankItemName)
+        {
+            var item = Player.Inventory.GetItemByName(invItemName);
+            if (item != null && !Player.Inventory.CanBank(item))
+            {
+                LogForm.Instance.devDebug($"[CanBank] Blocked bank swap for Class '{item.Name}' (prohibited by game inventory category rules).");
+                return;
+            }
+            Flash.Call("BankSwap", invItemName, bankItemName);
+        }
+
+        public bool ContainsItemX(string itemName, string quantity = "*")
+        {
+            InventoryItem inventoryItem = Items.FirstOrDefault((InventoryItem i) => i.Name.EqualsIgnoreCase(itemName));
+            if (inventoryItem != null)
+            {
+                if (!(quantity == "*"))
+                {
+                    return inventoryItem.Quantity >= int.Parse(quantity);
+                }
+                return true;
+            }
+            return false;
+        }
+        public bool ContainsItem(int id, int qty)
+        {//ItemId & quantity
+            return Items.FirstOrDefault((InventoryItem it) => it.Id == id)?.Quantity >= qty;
+        }
+
+        public bool ContainsItem(InventoryItem item, Dictionary<int,InventoryItem> cache = null)
+        {
+            //Console.WriteLine($"checking for item [{item.Name}] on bamk");
+            if (cache != null)
+                return cache.TryGetValue(item.Id, out var i) && i.Quantity >= item.Quantity;
+
+            return Items.FirstOrDefault((InventoryItem target) => target.Id == item.Id)?.Quantity >= item.Quantity;
+        }
+
+        public bool ContainsItem(string itemName, string quantity = "*")
+        {
+            InventoryItem item = Player.Bank.GetItemByName(itemName);
+            if (item == null)
+            {
+                return false;
+            }
+            else if (Int32.TryParse(quantity, out int qty))
+            {
+                return item.Quantity >= qty;
+            }
+            return true;
+        }
+
+        public void Show()
+        {
+            Flash.Call("ShowBank", new string[0]);
+        }
+
+        public void LoadItems()
+        {
+            Flash.Call("LoadBankItems", new string[0]);
+        }
+
+        public void GetBank()
+        {
+            Flash.Call("GetBank", new string[0]);
+        }
+    }
+}

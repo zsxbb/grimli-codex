@@ -1,0 +1,80 @@
+{
+  "app_version": "2.1",
+  "app_download_url": "https://github.com/zsxbb/grimli-codex/releases/latest/download/Grimoire.exe",
+  "app_release_url": "https://github.com/zsxbb/grimli-codex/releases/latest",
+  "changelog": "Grimlite Li x CODEX v2.0 - Official release with integrated Codex Script Bank & cloud sync.",
+  "scripts": [
+    {
+      "name": "AutoGrimDungeon.gbot",
+      "category": "Dungeon",
+      "description": "Auto clear Grim Dungeon rooms and bosses.",
+      "sha256": "596D223F84C0F0C23005DC9B8AC660E20E615055095E9AD733FC69AB9A68FB93"
+    },
+    {
+      "name": "New World, New Opportunities.gbot",
+      "category": "Farming",
+      "description": "Auto farm New World, New Opportunities quest.",
+      "sha256": "FAFB77637288F05ECB05B8EF4FE081FA8C16CD145337AAFF3C5CC81D47C33B88"
+    },
+    {
+      "name": "timekiller.gbot",
+      "category": "Class Combo",
+      "description": "TimeKiller class solo and farm combo script.",
+      "sha256": "3EB13B1351B3B0F9A579E1F837AFEE99BEB835D39D9D5911EB38529365AF743A"
+    },
+    {
+      "name": "Eclipse/prep.gbot",
+      "category": "Eclipse",
+      "description": "Gear & quest preparation for Midnight & Solstice.",
+      "sha256": "2DD13E7A8BA9126AD7A5BCE06DA8C6F564B3AE82CFC28B8F28E2B0BC22C11029"
+    },
+    {
+      "name": "Eclipse/AscendEclipse.gbot",
+      "category": "Eclipse",
+      "description": "Auto complete Ascend Eclipse dungeon.",
+      "sha256": "CDDE58F4DE4A2C3F8508190ECA07EE8DE754F8317CB65ECBAF10A96669B8A43C"
+    },
+    {
+      "name": "Eclipse/MidnightSun.gbot",
+      "category": "Eclipse",
+      "description": "Midnight Sun raid team bot.",
+      "sha256": "71534908FDC3A6035F48F0F1D0EF6EA0F39D9CA3097FE32449D8F0B68B162983"
+    },
+    {
+      "name": "Eclipse/SolsticeMoon.gbot",
+      "category": "Eclipse",
+      "description": "Solstice Moon raid team bot.",
+      "sha256": "EEF067ABF44F4560A7BBDBC46A2DC5BBFC11F7DB0756CD844531FAED890E7CC1"
+    },
+    {
+      "name": "Eclipse/Maid/AP-Solstice-P2.json",
+      "category": "Eclipse (Maid)",
+      "description": "ArchPaladin Maid config for Solstice Phase 2.",
+      "sha256": "A388DC0CF5919318DD1F6BE0BE3EA4D0484BA90587E79BAD63E897A035211716"
+    },
+    {
+      "name": "Eclipse/Maid/Dungeon-Follower.json",
+      "category": "Eclipse (Maid)",
+      "description": "Follower Maid config for Eclipse dungeon.",
+      "sha256": "92E81C8BE58561BD8F1EF8D1F3C32B4F873723E2FACBD61CADE23A635705ECCA"
+    },
+    {
+      "name": "Eclipse/Maid/LOO-Midnight-P1.json",
+      "category": "Eclipse (Maid)",
+      "description": "Lord of Order Maid config for Midnight Phase 1.",
+      "sha256": "A4AD1C562BEAB9CAEE6E8658166474A0BA668605CCA561A7BC9B8C35177C7C3F"
+    },
+    {
+      "name": "Eclipse/Maid/LR-Solstice-P1.json",
+      "category": "Eclipse (Maid)",
+      "description": "Legion Revenant Maid config for Solstice Phase 1.",
+      "sha256": "202147C800706F05441CD5F8163FABFF661D2C08720C69F178AE0F2626BDB52D"
+    },
+    {
+      "name": "Eclipse/Maid/SC-Midnight-P2.json",
+      "category": "Eclipse (Maid)",
+      "description": "StoneCrusher Maid config for Midnight Phase 2.",
+      "sha256": "FE61262DF503FE39E38DCD6F3AC877CB95103C074CA4121D729A1D201E9CEAB1"
+    }
+  ]
+}

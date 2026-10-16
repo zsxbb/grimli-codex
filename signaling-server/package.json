@@ -1,0 +1,12 @@
+{
+  "name": "grimcodex-voice-signaling",
+  "version": "2.0.0",
+  "description": "WebSocket voice signaling and audio relay server for GrimCodex (behind Cloudflare Proxy)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

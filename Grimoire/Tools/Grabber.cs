@@ -1,0 +1,881 @@
+using Grimoire.Game;
+using Grimoire.Game.Data;
+using Grimoire.UI;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
+using Grimoire.Botting;
+//using BrowserForm = Grimoire.UI.BrowserForm;
+using System.Diagnostics;
+using System.Dynamic;
+using System.Collections;
+using Grimoire.Botting.Commands.Item;
+
+namespace Grimoire.Tools
+{
+    public static class Grabber
+    {
+        public enum OrderBy
+        {
+            Name,
+            Id
+        }
+
+        public static List<String> GetQuestRewards(int idQuest)
+        {
+            List<String> listItem = new List<string>();
+
+            //foreach (Quest q in questTree)
+            //{
+            //    if (q.Id == idQuest)
+            //    {
+            //    }
+            //}
+            Quest q = Player.Quests.Quest(idQuest);
+            foreach (InventoryItem item in q.Rewards)
+            {
+                listItem.Add(item.Name);
+            }
+
+            return listItem;
+        }
+
+        public static List<String> GetQuestRequirment(int idQuest)
+        {
+            List<String> listItem = new List<string>();
+
+            //List<Quest> questTree = Player.Quests.QuestTree;
+            //foreach (Quest q in questTree)
+            //{
+            //    if (q.Id == idQuest)
+            //    {
+            //    }
+            //}
+            //Old code above lacks performance
+            Quest q = Player.Quests.Quest(idQuest);
+            foreach (InventoryItem item in q.RequiredItems)
+            {
+                listItem.Add(item.Name);
+            }
+
+            return listItem;
+        }
+
+        public static void GrabQuests(TreeView tree, OrderBy orderBy)
+        {
+            Player.Quests.QuestTreeRefresh();
+            List<Quest> list = Player.Quests.QuestTree;//?.OrderBy((Quest q) => q.Name).ToList();
+            switch (orderBy)
+            {
+                case OrderBy.Name:
+                default:
+                    list = list?.OrderBy((Quest q) => q.Name).ToList();
+                    break;
+                case OrderBy.Id:
+                    list = list?.OrderBy((Quest q) => q.Id).ToList();
+                    break;
+            }
+
+            if (list != null && list.Count > 0)
+            {
+                foreach (Quest quest in list)
+                {
+                    if (quest.Id == 0)
+                        continue;
+                    TreeNode treeNode;
+					if (orderBy == OrderBy.Id)
+                        treeNode = tree.Nodes.Add($"{quest.Id} - {quest.Name}");
+                    else
+						treeNode = tree.Nodes.Add($"{quest.Name} - {quest.Id}");
+                    // treeNode.Nodes.Add($"ID: {item.Id}");
+                    // List<InventoryItem> requiredItems = item.RequiredItems;
+                    if (quest.ISlot > 0)
+                        treeNode.Nodes.Add($"iSlot: {quest.ISlot}");
+                    if (quest.IValue > 0)
+                        treeNode.Nodes.Add($"iValue: {quest.IValue}");
+                    treeNode.Nodes.Add($"Description: {Shorten(quest.Description, 32)}");
+                    if (quest.RequiredItems != null && quest.RequiredItems.Count > 0)
+                    {
+                        TreeNode treeNode2 = treeNode.Nodes.Add("Required items");
+                        treeNode2.ContextMenuStrip = MenuItems(quest.RequiredItems);
+                        foreach (InventoryItem req in quest.RequiredItems)
+                        {
+                            TreeNode treeNode3 = treeNode2.Nodes.Add(req.Name + (req.Quantity > 1 ? " x" + req.Quantity : ""));
+                            treeNode3.ContextMenuStrip = MenuItem(req);
+                            treeNode3.Nodes.Add($"ID: {req.Id}");
+                            // treeNode3.Nodes.Add($"Quantity: {req.Quantity}");
+                            treeNode3.Nodes.Add("Temporary: " + (req.IsTemporary ? "Yes" : "No"));
+                            treeNode3.Nodes.Add($"Description: {Shorten(req.Description, 32)}");
+                        }
+                    }
+                    treeNode.ContextMenuStrip = MenuQuest((int)quest.Id, quest.RequiredItems);
+                    //List<InventoryItem> requiredItems = new List<InventoryItem>();
+
+                    List<InventoryItem> rewards = quest.Rewards;
+                    if (rewards != null && rewards.Count > 0)
+                    {
+                        TreeNode treeNode4 = treeNode.Nodes.Add("Rewards");
+                        treeNode4.ContextMenuStrip = MenuItems(quest.Rewards);
+                        foreach (InventoryItem reward in quest.Rewards)
+                        {
+                            TreeNode treeNode5 = treeNode4.Nodes.Add(reward.Name + (reward.Quantity > 1 ? " x" + reward.Quantity : ""));
+                            treeNode5.ContextMenuStrip = MenuItem(reward);
+                            treeNode5.Nodes.Add($"ID: {reward.Id}");
+                            // treeNode5.Nodes.Add($"Quantity: {reward.Quantity}");
+                            treeNode5.Nodes.Add(string.Concat($"Drop chance: ", reward.DropChance.Contains("100") ? "Guaranteed" : reward.DropChance + "%"));
+                            ItemBase reward2 = quest.oRewards.Find(x => x.Name == reward.Name);
+                            treeNode5.Nodes.Add($"Category: {reward2.Category}");
+                            treeNode5.Nodes.Add($"Description: {Shorten(reward2.Description, 32)}");
+                            if (!string.IsNullOrEmpty(reward2.File) && !string.IsNullOrEmpty(reward2.Link))
+                            {
+                                treeNode5.ContextMenuStrip = MenuItem(reward2);
+                                treeNode5.Nodes.Add($"sFile: {reward2.File}");
+                                treeNode5.Nodes.Add($"sLink: {reward2.Link}");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private static string Shorten(string s, int max)
+        {
+            if (string.IsNullOrEmpty(s)) return "";
+            return s.Length > max ? s.Substring(0, max) + "..." : s;
+        }
+        public static void GrabShopItems(TreeView tree)
+        {
+            List<ShopInfo> list = World.LoadedShops?.OrderBy((ShopInfo s) => s.Name).ToList();
+            if (list != null && list.Count > 0)
+            {
+                foreach (ShopInfo shop in list)
+                {
+                    TreeNode treeNode = tree.Nodes.Add(shop.Name);
+                    treeNode.ContextMenuStrip = Wiki(shop);
+                    treeNode.Nodes.Add($"ID: {shop.Id}");
+                    treeNode.Nodes.Add($"Location: {shop.Location}");
+                    List<InventoryItem> items = shop.Items;
+                    if (items != null && items.Count > 0)
+                    {
+                        TreeNode treeNode2 = treeNode.Nodes.Add("Items");
+                        foreach (InventoryItem shopItem in shop.Items)
+                        {
+                            TreeNode treeNode3 = treeNode2.Nodes.Add(shopItem.Name + (shopItem.Quantity > 1 ? " x" + shopItem.Quantity : ""));
+                            treeNode3.ContextMenuStrip = Wiki(shopItem, shop);
+                            treeNode3.Nodes.Add($"Shop item ID: {shopItem.ShopItemId}");
+                            treeNode3.Nodes.Add($"ID: {shopItem.Id}");
+                            treeNode3.Nodes.Add(string.Format("Cost: {0} {1}", shopItem.Cost, shopItem.IsAcItem ? "AC" : "Gold"));
+                            treeNode3.Nodes.Add($"Category: {shopItem.Category}");
+                            treeNode3.Nodes.Add($"Level: {shopItem.Level}");
+                            treeNode3.Nodes.Add($"Description: {Shorten(shopItem.Description, 32)}");
+                            treeNode3.Nodes.Add($"Stack: {shopItem.Quantity}/{shopItem.MaxStack}");
+                            if (shopItem.IsEquippableNonItem || shopItem.IsWeapon)
+                            {
+                                treeNode3.Nodes.Add($"sFile: {shopItem.File}");
+                                treeNode3.Nodes.Add($"sLink: {shopItem.Link}");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void GrabQuestIds(TreeView tree, OrderBy orderBy)
+        {
+            Player.Quests.QuestTreeRefresh();
+            List<Quest> list = Player.Quests.QuestTree;//?.OrderBy((Quest q) => q.Name).ToList();
+            switch (orderBy)
+            {
+                default:
+                case OrderBy.Name:
+                    list = list.OrderBy((Quest q) => q.Name).ToList();
+                    break;
+                case OrderBy.Id:
+                    list = list.OrderBy((Quest q) => q.Id).ToList();
+                    break;
+            }
+            //if (list != null && list.Count > 0)
+            //{
+            foreach (Quest quest in list)
+            {
+                if (quest.Id == 0)
+                    continue;
+                string desc;
+                if (orderBy == OrderBy.Id)
+					desc = $"{quest.Id} - {quest.Name}";
+                else
+                    desc = $"{quest.Name} - {quest.Id}";
+                tree.Nodes.Add(desc).ContextMenuStrip = MenuQuest((int)quest.Id, quest.RequiredItems);
+            }
+            //}
+            //else
+            //{
+            //    LogForm.Instance.devDebug("WTF is going on, why it fails to load??");
+            //}
+        }
+
+        public static void GrabInventoryItems(TreeView tree)
+        {
+            GrabItems(tree, inventory: true);
+        }
+
+        public static void GrabBankItems(TreeView tree)
+        {
+            GrabItems(tree, inventory: false);
+        }
+
+        private static void GrabItems(TreeView tree, bool inventory)
+        {
+            List<InventoryItem> list = (inventory ? Player.Inventory.Items : Player.Bank.Items)?.OrderBy((InventoryItem i) => i.Name).ToList();
+            if (list != null && list.Count > 0)
+            {
+                foreach (InventoryItem item in list)
+                {
+                    TreeNode treeNode = tree.Nodes.Add($"{item.Name} ({item.Id})");
+                    treeNode.ContextMenuStrip = Wiki(item);
+                    treeNode.Nodes.Add($"ID: {item.Id}");
+                    treeNode.Nodes.Add($"Char item id: {item.CharItemId}");
+                    treeNode.Nodes.Add($"Quantity: {item.Quantity}/{item.MaxStack}");
+                    treeNode.Nodes.Add($"AC tagged: {item.IsAcItem}");
+                    treeNode.Nodes.Add($"Category: {item.Category}");
+                    treeNode.Nodes.Add($"Level: {item.Level}");
+                    treeNode.Nodes.Add($"Description: {Shorten(item.Description, 32)}");
+                    if (item.IsEquippableNonItem || item.IsWeapon)
+                    {
+                        treeNode.Nodes.Add($"sFile: {item.File}");
+                        treeNode.Nodes.Add($"sLink: {item.Link}");
+
+                        // Show a friendly enhancement name if we know it.
+                        string enhName = null;
+                        if (InventoryItem.EnhancementNames.TryGetValue(item.Enhancement, out var named))
+                            enhName = named;
+                        else if (item.ForgeEnhancement.HasValue)
+                            enhName = item.ForgeEnhancement.Value.ToString();
+
+                        treeNode.Nodes.Add($"Enhancement: {enhName ?? "Unknown"}");
+                        treeNode.Nodes.Add($"Enhancement ID: {item.Enhancement}");
+                    }
+                }
+            }
+        }
+
+        public static void GrabTempItems(TreeView tree)
+        {
+            List<TempItem> list = Player.TempInventory.Items?.OrderBy((TempItem i) => i.Name).ToList();
+            if (list != null && list.Count > 0)
+            {
+                foreach (TempItem item in list)
+                {
+                    TreeNode treeNode = tree.Nodes.Add($"{item.Name} [{item.Quantity}/{item.MaxStack}]");
+                    treeNode.ContextMenuStrip = Wiki(item.Name);
+                    treeNode.Nodes.Add($"ID: {item.Id}");
+                    treeNode.Nodes.Add($"Quantity: {item.Quantity}/{item.MaxStack}");
+                }
+            }
+        }
+
+        public static void GrabMonsters(TreeView tree)
+        {
+            List<Monster> list = null;
+            try
+            {
+                list = (from x in World.AvailableMonsters()?.GroupBy((Monster m) => m.MonMapID)
+                        select x.First()).ToList();
+                switch (Loaders.order)
+                {
+                    case OrderBy.Name:
+                        list = list.OrderBy(m => m.Name).ToList();
+                        break;
+                    case OrderBy.Id:
+                        list = list.OrderBy(m => m.MonMapID).ToList();
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Please wait for map loaded or Login first before grabbing\n\n{ex.Message}",
+                    "GrabMonsters Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning
+                );
+            }
+
+            if (list != null && list.Count > 0)
+            {
+                foreach (Monster item in list)
+                {
+                    TreeNode treeNode = tree.Nodes.Add(item.Name);
+                    treeNode.ContextMenuStrip = Wiki(item.Name);
+                    treeNode.Nodes.Add($"ID: {item.Id}");
+                    treeNode.Nodes.Add($"MonMapID: {item.MonMapID}");
+                    treeNode.Nodes.Add($"Race: {item.Race}");
+                    treeNode.Nodes.Add($"Level: {item.Level}");
+                    treeNode.Nodes.Add($"Health: {item.Health}/{item.MaxHealth}");
+                }
+            }
+        }
+
+        public static void GrabAllMonsters(TreeView tree)
+        {
+            List<Monster> list = World.GetAllMonsters();
+            switch (Loaders.order)
+            {
+                case OrderBy.Name:
+                    list = list.OrderBy(m => m.Name).ToList();
+                    break;
+                case OrderBy.Id:
+                    list = list.OrderBy(m => m.MonMapID).ToList();
+                    break;
+            }
+            //    (from x in World.AvailableMonsters?.GroupBy((Monster m) => m.MonMapID)
+            //                      select x.First()).ToList();
+            if (list != null && list.Count > 0)
+            {
+                foreach (Monster item in list)
+                {
+                    TreeNode treeNode = tree.Nodes.Add($"{item.Name} ({item.cell})");
+                    treeNode.ContextMenuStrip = Wiki(item.Name);
+                    treeNode.Nodes.Add($"ID: {item.Id}");
+                    treeNode.Nodes.Add($"MonMapID: {item.MonMapID}");
+                    //treeNode.Nodes.Add($"Cell: {item.cell}");
+                    treeNode.Nodes.Add($"Race: {item.Race}");
+                    treeNode.Nodes.Add($"Level: {item.Level}");
+                    treeNode.Nodes.Add($"Health: {item.Health}/{item.MaxHealth}");
+                }
+            }
+        }
+
+        private static ContextMenuStrip Wiki(string item)
+        {
+            ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+            ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem
+            {
+                Text = "Go to Wikipage"
+            };
+            ToolStripMenuItem toolStripMenuItem1 = new ToolStripMenuItem
+            {
+                Text = "Search on Wiki"
+            };
+            ToolStripMenuItem toolStripMenuItem2 = new ToolStripMenuItem
+            {
+                Text = "Copy To Clipboard"
+            };
+            toolStripMenuItem.Click += delegate (object S, EventArgs E)
+            {
+                //System.Diagnostics.Process.Start
+                Search("https://aqwwiki.wikidot.com/" + item.Replace(" ", "+"));
+            };
+            toolStripMenuItem1.Click += delegate (object S, EventArgs E)
+            {
+                //System.Diagnostics.Process.Start
+                Search("https://aqwwiki.wikidot.com/search:site/q/" + item.Replace(" ", "+"));
+            };
+            toolStripMenuItem2.Click += delegate (object S, EventArgs E)
+            {
+                Clipboard.SetText(item);
+            };
+            contextMenuStrip.Items.Add(toolStripMenuItem);
+            contextMenuStrip.Items.Add(toolStripMenuItem1);
+            contextMenuStrip.Items.Add(toolStripMenuItem2);
+            return contextMenuStrip;
+        }
+
+        private static ContextMenuStrip Wiki(ShopInfo item)
+        {
+            ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+            ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem
+            {
+                Text = "Go to Wikipage"
+            };
+            ToolStripMenuItem toolStripMenuItem1 = new ToolStripMenuItem
+            {
+                Text = "Search on Wiki"
+            };
+
+            toolStripMenuItem.Click += delegate (object S, EventArgs E)
+            {
+                //System.Diagnostics.Process.Start
+                Search("https://aqwwiki.wikidot.com/" + item.Name.Replace(" ", "+"));
+            };
+            toolStripMenuItem1.Click += delegate (object S, EventArgs E)
+            {
+                //System.Diagnostics.Process.Start
+                Search("https://aqwwiki.wikidot.com/search:site/q/" + item.Name.Replace(" ", "+"));
+            };
+            ToolStripMenuItem toolStripMenuItem2 = new ToolStripMenuItem
+            {
+                Text = "Load Shop"
+            };
+            toolStripMenuItem2.Click += delegate (object S, EventArgs E)
+            {
+                Shop.Load(item.Id);
+            };
+            contextMenuStrip.Items.Add(toolStripMenuItem);
+            contextMenuStrip.Items.Add(toolStripMenuItem1);
+            contextMenuStrip.Items.Add(toolStripMenuItem2);
+            return contextMenuStrip;
+        }
+
+        private static ContextMenuStrip Wiki(InventoryItem Item, ShopInfo shop = null)
+        {
+            ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+            ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem
+            {
+                Text = "Go to Wikipage"
+            };
+            ToolStripMenuItem toolStripMenuItem1 = new ToolStripMenuItem
+            {
+                Text = "Search on Wiki"
+            };
+            ToolStripMenuItem toolStripMenuItem2 = new ToolStripMenuItem
+            {
+                Text = "Equip SWF"
+            };
+            toolStripMenuItem.Click += delegate (object S, EventArgs E)
+            {
+                //System.Diagnostics.Process.Start
+                Search("https://aqwwiki.wikidot.com/" + Item.Name.Replace(" ", "+"));
+            };
+            toolStripMenuItem1.Click += delegate (object S, EventArgs E)
+            {
+                //System.Diagnostics.Process.Start
+                Search("https://aqwwiki.wikidot.com/search:site/q/" + Item.Name.Replace(" ", "+"));
+            };
+            toolStripMenuItem2.Click += delegate
+            {
+                string txt = Item.Category;
+                string slot;
+                if (txt == "Cape")
+                    slot = "ba";
+                else if (txt == "Pet")
+                    slot = "pe";
+                else if (txt == "Armor" || txt == "Class")
+                    slot = "co";
+                else if (txt == "Helm")
+                    slot = "he";
+                else if (txt == "Misc")
+                    slot = "mi";
+                else
+                    slot = "Weapon";
+                dynamic equip = new ExpandoObject();
+                equip.sFile = Item.File;
+                equip.sLink = Item.Link;
+                equip.sType = txt;
+                Flash.Call("SetEquip", new object[2] { slot, equip });
+            };
+            contextMenuStrip.Items.Add(toolStripMenuItem);
+            contextMenuStrip.Items.Add(toolStripMenuItem1);
+            if (Item.IsWeapon || Item.IsEquippableNonItem)
+                contextMenuStrip.Items.Add(toolStripMenuItem2);
+            if (shop != null)
+            {
+                ToolStripMenuItem toolCmdBuy = new ToolStripMenuItem
+                {
+                    Text = "Add buy command"
+                };
+                ToolStripMenuItem toolBuyNow = new ToolStripMenuItem
+                {
+                    Text = "Buy This Item"
+                };
+                int buyQty = Item.Quantity; //ctrlpressed ? -1 : Item.Quantity;
+                
+                toolCmdBuy.OnClick(() =>
+                    BotManager.Instance.AddCommand(cmd:
+                        new CmdBuy
+                        {
+                            ShopId = shop.Id,
+                            ItemId = Item.Id,
+                            ItemName = Item.Name,
+                            ShopItemId = Item.ShopItemId,
+                            Qty = buyQty,
+                        }, true)
+                );
+                toolBuyNow.OnClick(() => Shop.BuyItemQty(Item.Id, Item.ShopItemId, buyQty));
+                
+                if (Item.IsAcItem && Item.Cost > 0)
+                    toolBuyNow.Text = "Buy This Item (warning costing ACs)";
+                
+                contextMenuStrip.Items.Add(toolBuyNow);
+                contextMenuStrip.Items.Add(toolCmdBuy);
+            }
+            return contextMenuStrip;
+        }
+        
+        private static ContextMenuStrip MenuQuest(int QuestID, List<InventoryItem> Items = null)
+        {
+            ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+            ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem
+            {
+                Text = "Add to quest list"
+            };
+            ToolStripMenuItem toolStripMenuItem1 = new ToolStripMenuItem
+            {
+                Text = "Accept Quest"
+            };
+            ToolStripMenuItem toolStripMenuItem2 = new ToolStripMenuItem
+            {
+                Text = "Complete Quest (Once)"
+            };
+            ToolStripMenuItem toolStripMenuItem3 = new ToolStripMenuItem
+            {
+                Text = "Load Quest"
+            };
+            toolStripMenuItem.Click += delegate (object S, EventArgs E)
+            {
+                AddQuest(S, E, QuestID);
+            };
+            toolStripMenuItem1.Click += delegate (object S, EventArgs E)
+            {
+                Player.Quests.Accept(QuestID);
+            };
+            toolStripMenuItem2.Click += delegate (object S, EventArgs E)
+            {
+                Player.Quests.Quest(QuestID).Complete(autoSelect:true);
+            };
+            toolStripMenuItem3.Click += delegate (object S, EventArgs E)
+            {
+                Player.Quests.Load(QuestID);
+            };
+            contextMenuStrip.Items.Add(toolStripMenuItem);
+            contextMenuStrip.Items.Add(toolStripMenuItem1);
+            contextMenuStrip.Items.Add(toolStripMenuItem2);
+            contextMenuStrip.Items.Add(toolStripMenuItem3);
+            ToolStripMenuItem toolStripMenuItem4 = new ToolStripMenuItem
+            {
+                Text = "Complete Quest (Maxed)"
+            };
+            toolStripMenuItem4.Click += delegate (object S, EventArgs E)
+            {
+                Player.Quests.Quest(QuestID).Complete(max: true);
+            };
+            contextMenuStrip.Items.Add(toolStripMenuItem4);
+
+            if (Items != null)
+            {
+                ToolStripMenuItem toolStripMenuItem5 = new ToolStripMenuItem
+                {
+                    Text = "Copy all Reqs"
+                };
+                toolStripMenuItem5.Click += delegate (object S, EventArgs E)
+                {
+                    string longString =
+                    $"\"ItemName\" : \"{string.Join(",", Items.Select(i => i.Name))}\",\n" +
+                    $"\"Quantity\" : \"{string.Join(",", Items.Select(i => i.Quantity))}\"";
+                    Clipboard.SetText(longString);
+                };
+                contextMenuStrip.Items.Add(toolStripMenuItem5);
+                ToolStripMenuItem progres = new ToolStripMenuItem
+                {
+                    Text = "Copy Bypass Packet"
+                };
+                progres.Click += delegate (object S, EventArgs E)
+                {
+                    var quest = Player.Quests.Quest(QuestID);
+                    string longString = "{\"t\":\"xt\",\"b\":{\"r\":-1,\"o\":{\"cmd\":\"updateQuest\",\"iValue\":" + quest.IValue + ",\"iIndex\":" + quest.ISlot + "}}}"; ;
+                    Clipboard.SetText(longString);
+                };
+                contextMenuStrip.Items.Add(progres);
+            }
+            return contextMenuStrip;
+        }
+
+        private static ContextMenuStrip MenuItems(List<InventoryItem> Items)
+        {
+            ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+            ToolStripMenuItem bothlist = new ToolStripMenuItem
+            {
+                Text = "Add all to both"
+            };
+            ToolStripMenuItem whitelist = new ToolStripMenuItem
+            {
+                Text = "Add all to whitelist"
+            };
+            ToolStripMenuItem unbanklist = new ToolStripMenuItem
+            {
+                Text = "Add all to unbank list"
+            };
+            ToolStripMenuItem searchWiki = new ToolStripMenuItem
+            {
+                Text = "Search all on Wiki"
+            };
+            bothlist.Click += delegate (object S, EventArgs E)
+            {
+                AddDrops(S, E, Items);
+                AddItems(S, E, Items);
+            };
+            whitelist.Click += delegate (object S, EventArgs E)
+            {
+                AddDrops(S, E, Items);
+            };
+            unbanklist.Click += delegate (object S, EventArgs E)
+            {
+                AddDrops(S, E, Items);
+            };
+            searchWiki.Click += delegate (object S, EventArgs E)
+            {
+                foreach (InventoryItem Item in Items)
+                {
+                    Process.Start("https://aqwwiki.wikidot.com/search:site/q/" + Item.Name.Replace(" ", "+"));
+                }
+            };
+            ToolStripMenuItem copyReqs = new ToolStripMenuItem
+            {
+                Text = "Copy all"
+            };
+            copyReqs.Click += delegate (object S, EventArgs E)
+            {
+                var longString =
+                    $"\"ItemName\" : \"{string.Join(",", Items.Select(i => i.Name))}\"\n" +
+                    $"\"Quantity\" : \"{string.Join(",", Items.Select(i => i.Quantity))}\"";
+                Clipboard.SetText(longString);
+            };
+            contextMenuStrip.Items.Add(bothlist);
+            contextMenuStrip.Items.Add(whitelist);
+            contextMenuStrip.Items.Add(unbanklist);
+            contextMenuStrip.Items.Add(searchWiki);
+            contextMenuStrip.Items.Add(copyReqs);
+            return contextMenuStrip;
+        }
+
+        private static ContextMenuStrip MenuItem(InventoryItem Item)
+        {
+            ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+            ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem
+            {
+                Text = "Add to both"
+            };
+            ToolStripMenuItem toolStripMenuItem2 = new ToolStripMenuItem
+            {
+                Text = "Add to whitelist"
+            };
+            ToolStripMenuItem toolStripMenuItem3 = new ToolStripMenuItem
+            {
+                Text = "Add to unbank list"
+            };
+            ToolStripMenuItem toolStripMenuItem4 = new ToolStripMenuItem
+            {
+                Text = "Copy item name to clipboard"
+            };
+            ToolStripMenuItem toolStripMenuItem5 = new ToolStripMenuItem
+            {
+                Text = "Go to Wikipage"
+            };
+            ToolStripMenuItem toolStripMenuItem6 = new ToolStripMenuItem
+            {
+                Text = "Search on Wiki"
+            };
+            toolStripMenuItem.Click += delegate (object S, EventArgs E)
+            {
+                AddDrop(S, E, Item);
+                AddItem(S, E, Item);
+            };
+            toolStripMenuItem2.Click += delegate (object S, EventArgs E)
+            {
+                AddDrop(S, E, Item);
+            };
+            toolStripMenuItem3.Click += delegate (object S, EventArgs E)
+            {
+                AddItem(S, E, Item);
+            };
+            toolStripMenuItem4.Click += delegate
+            {
+                Clipboard.SetText(Item.Name);
+            };
+            toolStripMenuItem5.Click += delegate (object S, EventArgs E)
+            {
+                //System.Diagnostics.Process.Start("https://aqwwiki.wikidot.com/" + Item.Name.Replace(" ", "+"));
+                Search("https://aqwwiki.wikidot.com/" + Item.Name.Replace(" ", "+"));
+            };
+            toolStripMenuItem6.Click += delegate (object S, EventArgs E)
+            {
+                //System.Diagnostics.Process.Start("https://aqwwiki.wikidot.com/search:site/q/" + Item.Name.Replace(" ", "+"));
+                Search("https://aqwwiki.wikidot.com/search:site/q/" + Item.Name.Replace(" ", "+"));
+            };
+            contextMenuStrip.Items.Add(toolStripMenuItem);
+            contextMenuStrip.Items.Add(toolStripMenuItem2);
+            contextMenuStrip.Items.Add(toolStripMenuItem3);
+            contextMenuStrip.Items.Add(toolStripMenuItem4);
+            contextMenuStrip.Items.Add(toolStripMenuItem5);
+            contextMenuStrip.Items.Add(toolStripMenuItem6);
+            return contextMenuStrip;
+        }
+
+        private static ContextMenuStrip MenuItem(ItemBase Item)
+        {
+            ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+            ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem
+            {
+                Text = "Add to both"
+            };
+            ToolStripMenuItem toolStripMenuItem2 = new ToolStripMenuItem
+            {
+                Text = "Add to whitelist"
+            };
+            ToolStripMenuItem toolStripMenuItem3 = new ToolStripMenuItem
+            {
+                Text = "Add to unbank list"
+            };
+            ToolStripMenuItem toolStripMenuItem4 = new ToolStripMenuItem
+            {
+                Text = "Copy item name to clipboard"
+            };
+            ToolStripMenuItem toolStripMenuItem5 = new ToolStripMenuItem
+            {
+                Text = "Go to Wikipage"
+            };
+            ToolStripMenuItem toolStripMenuItem6 = new ToolStripMenuItem
+            {
+                Text = "Search on Wiki"
+            };
+            ToolStripMenuItem toolStripMenuItem7 = new ToolStripMenuItem
+            {
+                Text = "Equip SWF"
+            };
+            toolStripMenuItem.Click += delegate (object S, EventArgs E)
+            {
+                AddDrop(S, E, Item);
+                AddItem(S, E, Item);
+            };
+            toolStripMenuItem2.Click += delegate (object S, EventArgs E)
+            {
+                AddDrop(S, E, Item);
+            };
+            toolStripMenuItem3.Click += delegate (object S, EventArgs E)
+            {
+                AddItem(S, E, Item);
+            };
+            toolStripMenuItem4.Click += delegate
+            {
+                Clipboard.SetText(Item.Name);
+            };
+            toolStripMenuItem5.Click += delegate (object S, EventArgs E)
+            {
+                //System.Diagnostics.Process.Start("https://aqwwiki.wikidot.com/" + Item.Name.Replace(" ", "+"));
+                Search("https://aqwwiki.wikidot.com/" + Item.Name.Replace(" ", "+"));
+            };
+            toolStripMenuItem6.Click += delegate (object S, EventArgs E)
+            {
+                //System.Diagnostics.Process.Start("https://aqwwiki.wikidot.com/search:site/q/" + Item.Name.Replace(" ", "+"));
+                Search("https://aqwwiki.wikidot.com/search:site/q/" + Item.Name.Replace(" ", "+"));
+            };
+            toolStripMenuItem7.Click += delegate
+            {
+                string txt = Item.Category;
+                string slot;
+                if (txt == "Cape")
+                    slot = "ba";
+                else if (txt == "Pet")
+                    slot = "pe";
+                else if (txt == "Armor" || txt == "Class")
+                    slot = "co";
+                else if (txt == "Helm")
+                    slot = "he";
+                else if (txt == "Misc")
+                    slot = "mi";
+                else
+                    slot = "Weapon";
+                dynamic equip = new ExpandoObject();
+                equip.sFile = Item.File;
+                equip.sLink = Item.Link;
+                equip.sType = txt;
+                Flash.Call("SetEquip", new object[2] { slot, equip });
+            };
+            contextMenuStrip.Items.Add(toolStripMenuItem);
+            contextMenuStrip.Items.Add(toolStripMenuItem2);
+            contextMenuStrip.Items.Add(toolStripMenuItem3);
+            contextMenuStrip.Items.Add(toolStripMenuItem4);
+            contextMenuStrip.Items.Add(toolStripMenuItem5);
+            contextMenuStrip.Items.Add(toolStripMenuItem6);
+            contextMenuStrip.Items.Add(toolStripMenuItem7);
+            return contextMenuStrip;
+        }
+
+        private static void Search(string Item)
+        {
+            //BrowserForm.Instance.LoadUrl(Item);
+            Process.Start(Item);
+        }
+
+        private static void AddDrop(object s, EventArgs e, InventoryItem Item)
+        {
+            if (!Item.IsTemporary)
+            {
+                BotManager.Instance.AddDrop(Item.Name);
+            }
+        }
+
+        private static void AddItem(object s, EventArgs e, InventoryItem Item)
+        {
+            if (!Item.IsTemporary)
+            {
+                BotManager.Instance.AddItem(Item.Name);
+            }
+        }
+
+        private static void AddDrops(object s, EventArgs e, List<InventoryItem> Items)
+        {
+            HashSet<string> Drops = BotManager.Instance.lstDrops.Items
+                .Cast<object>()
+                .Where(x => x != null)
+                .Select(x => x.ToString())
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            foreach (InventoryItem Item in Items)
+            {
+                if (!Drops.Contains(Item.Name))
+                {
+                    Drops.Add(Item.Name);
+                    AddDrop(s, e, Item);
+                }
+            }
+        }
+
+        private static void AddItems(object s, EventArgs e, List<InventoryItem> Items)
+        {
+            foreach (InventoryItem Item in Items)
+            {
+                AddItem(s, e, Item);
+            }
+        }
+
+        private static void AddDrop(object s, EventArgs e, ItemBase Item)
+        {
+            if (!Item.Temp)
+            {
+                BotManager.Instance.AddDrop(Item.Name);
+            }
+        }
+
+        private static void AddItem(object s, EventArgs e, ItemBase Item)
+        {
+            if (!Item.Temp)
+            {
+                BotManager.Instance.AddItem(Item.Name);
+            }
+        }
+
+        private static void AddDrops(object s, EventArgs e, List<ItemBase> Items)
+        {
+            foreach (ItemBase Item in Items)
+            {
+                AddDrop(s, e, Item);
+            }
+        }
+
+        private static void AddItems(object s, EventArgs e, List<ItemBase> Items)
+        {
+            foreach (ItemBase Item in Items)
+            {
+                AddItem(s, e, Item);
+            }
+        }
+
+
+        private static void AddQuest(object s, EventArgs e, int ID)
+        {
+            BotManager.Instance.AddQuest(ID);
+        }
+    }
+}

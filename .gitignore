@@ -1,0 +1,28 @@
+## Visual Studio / Build outputs
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+
+## NuGet
+packages/*
+!packages/repositories.config
+!packages.config
+
+## Scratch / Temp
+scratch/
+*.tmp
+*.log
+*.bak
+*.backup
+
+## Node.js (Signaling Server)
+signaling-server/node_modules/
+signaling-server/npm-debug.log*
+
+## OS generated files
+.DS_Store
+Thumbs.db

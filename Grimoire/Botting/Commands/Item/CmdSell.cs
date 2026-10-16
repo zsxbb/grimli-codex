@@ -1,0 +1,60 @@
+using Grimoire.Game;
+using Grimoire.Game.Data;
+using Grimoire.Tools;
+using Grimoire.UI;
+using Newtonsoft.Json;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Grimoire.Botting.Commands.Item
+{
+    public class CmdSell : IBotCommand
+    {
+        public string ItemName
+        {
+            get;
+            set;
+        }
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
+        public string Qty
+        {
+            get;
+            set;
+        } = "1";
+        public async Task Execute(IBotEngine instance)
+        {
+            BotData.BotState = BotData.State.Transaction;
+            string _ItemName = instance.ResolveVars(ItemName);
+            int _qty = int.Parse(instance.ResolveVars(Qty));
+            await instance.WaitUntil(() => World.IsActionAvailable(LockActions.SellItem));
+            InventoryItem item = Player.Inventory.Items.FirstOrDefault((InventoryItem i) => i.Name.EqualsIgnoreCase(_ItemName));
+            if (item != null)
+            {
+                if (ClientConfig.ProtectFavorites && Player.Inventory.IsFavorited(item.Id))
+                {
+                    LogForm.Instance.devDebug($"[ProtectFavorites] Skipped selling favorited item: {item.Name} ({item.Id})");
+                    return;
+                }
+
+                using (new pauseProvoke(instance.Configuration))
+                {
+                    await Player.ExitCombat(2000);
+                    Shop.SellItem(_ItemName, _qty);
+                    await instance.WaitUntil(() => !Player.Inventory.ContainsItem(item.Name, item.Quantity.ToString()),timeout:3);
+                }
+            }
+        }
+
+        public override string ToString()
+        {
+            int.TryParse(Qty, out int value);
+
+            if (value == 0 && !Qty.Contains("["))
+                return $"Sell (all): {ItemName}";
+            else if (value < 0)
+                return $"Sell (until): {ItemName} x{Math.Abs(value)}";
+            return $"Sell: {ItemName} x{Qty}";
+        }
+    }
+}

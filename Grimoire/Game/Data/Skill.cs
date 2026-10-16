@@ -1,0 +1,188 @@
+using System;
+using System.Collections.Generic;
+using Grimoire.Botting;
+using Grimoire.Tools;
+using Newtonsoft.Json.Linq;
+
+namespace Grimoire.Game.Data
+{
+    public class Skill
+    {
+        public string Text
+        {
+            get;
+            set;
+        }
+        public string Index { get; set; }
+
+        public Skill.SkillType Type { get; set; }
+
+        public Skill.SafeType SType { get; set; }
+
+        public bool IsSafeMp { get; set; }
+
+        public int SafeValue { get; set; }
+        public bool waitCd { get; set; } = false;
+        public string aura { get; set; }
+        public static string GetSkillName(string index)
+        {
+            return Flash.Call<string>("GetSkillName", new string[]{index});
+        }
+
+        public static bool isBuff(string index)
+        {
+            try
+            {
+                var prop = Flash.Instance.GetGameObject<List<JObject>>("world.actions.active");
+
+                string selfskill = prop[int.Parse(index)]?["tgt"]?.ToString();
+                //debug($"{selfskill}");
+                return selfskill != "h"; //H or F/S [H - monster/hostile, F/S - Friendly/self]
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public enum SkillType
+        {
+            Normal,
+            Safe,
+            Label
+        }
+
+        public enum SafeType
+        {
+            LowerThan,
+            GreaterThan,
+            Equals
+        }
+
+        public void ExecuteSkill()
+        {
+            Skill s = this;
+            if (s.Type == Skill.SkillType.Safe)
+            {
+                if (s.IsSafeMp)
+                {
+                    switch (s.SType)
+                    {
+                        case Skill.SafeType.LowerThan:
+                            if ((double)Player.Mana / Player.ManaMax * 100 <= s.SafeValue)
+                                useSkill(s.Index);
+                            break;
+                        case Skill.SafeType.GreaterThan:
+                            if ((double)Player.Mana / Player.ManaMax * 100 >= s.SafeValue)
+                                useSkill(s.Index);
+                            break;
+                        case Skill.SafeType.Equals:
+                            if ((double)Player.Mana / Player.ManaMax * 100 == s.SafeValue)
+                                useSkill(s.Index);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (s.SType)
+                    {
+                        case Skill.SafeType.LowerThan:
+                            if ((double)Player.Health / Player.HealthMax * 100 <= s.SafeValue)
+                                useSkill(s.Index);
+                            break;
+                        case Skill.SafeType.GreaterThan:
+                            if ((double)Player.Health / Player.HealthMax * 100 >= s.SafeValue)
+                                useSkill(s.Index);
+                            break;
+                        case Skill.SafeType.Equals:
+                            if ((double)Player.Health / Player.HealthMax * 100 == s.SafeValue)
+                                useSkill(s.Index);
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                useSkill(s.Index);
+                //Player.UseSkill(s.Index);
+            }
+        }
+        public bool hasaura()
+        {
+            if (string.IsNullOrWhiteSpace(aura))
+                return true;
+
+            string op;
+            if (this.aura.Contains("!="))
+                op = "!=";
+            else if (this.aura.Contains(">="))
+                op = ">=";
+            else if (this.aura.Contains("<="))
+                op = "<=";
+            else if (this.aura.Contains("="))
+                op = "=";
+            else
+                return true;
+
+            string[] parts = this.aura.Split(
+                new[] { op },
+                StringSplitOptions.RemoveEmptyEntries
+            );
+
+            if (parts.Length != 2)
+                return true;
+
+            return Compare(parts, op);
+        }
+        bool Compare(string[] aura, string op)
+        {
+            int c = Player.GetAuras(true, aura[0]); //Self aura only
+            //int.TryParse(cur, out int c);
+            int.TryParse(aura[1], out int t);
+
+            switch (op)
+            {
+                case ">=": return c >= t;
+                case "<=": return c < t;
+                case "=": return c == t;
+                case "!=": return c != t;
+                default: return true;
+            }
+        }
+        private void useSkill(string Index)
+        {
+            if (Player.EquippedClass.EqualsIgnoreCase("Chrono Shadow"))
+            {
+                Player.ForceUseSkill(Index);
+                return;
+            }
+            Player.UseSkill(Index);
+        }
+
+        public override string ToString()
+        {
+            string text = Text;
+            if (text != null)
+                if (text.StartsWith("1: ") || text.StartsWith("2: ") || text.StartsWith("3: ") || text.StartsWith("4: "))
+                {
+                    text = text.Remove(0, 3);
+                }
+            string skillName = text ?? Skill.GetSkillName(Index);
+            string safeType = IsSafeMp ? "MP" : "HP";
+            string safeTypeS = SType == SafeType.GreaterThan ? ">=" : "<=";
+
+            string skillText;
+
+
+            if (Type == SkillType.Safe)
+                skillText = $"[{safeType} {safeTypeS} {SafeValue}%] {Index}: {skillName}";
+            else if (Type == SkillType.Label)
+                skillText = $"{Text}";
+            else if (!string.IsNullOrWhiteSpace(aura))
+                skillText = $"{Index}: {skillName} [Aura : {aura}]";
+            else //normal
+                skillText = $"{Index}: {skillName}";
+            return waitCd ? $"[Wait] {skillText}" : skillText;
+        }
+    }
+}

@@ -1,0 +1,341 @@
+using Grimoire.Botting;
+using Grimoire.Networking;
+using Grimoire.Tools;
+using Grimoire.UI;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Grimoire.Game.Data
+{
+    public class Shop
+    {
+        public static Shop Instance = new Shop();
+
+        [JsonProperty("sName")]
+        public string Name
+        {
+            get;
+            set;
+        }
+
+        [JsonProperty("ShopID")]
+        public int Id
+        {
+            get;
+            set;
+        }
+
+        [JsonProperty("items")]
+        public List<InventoryItem> Items
+        {
+            get;
+            set;
+        }
+
+        public string Location
+        {
+            get;
+            set;
+        }
+
+        public static bool IsShopLoaded => Flash.Call<bool>("IsShopLoaded", new string[0]);
+
+        public static void BuyItem(string name)
+        {
+            Flash.Call("BuyItem", name);
+        }
+
+        public static void BuyItemQty(string name, int qty)
+        {
+
+            if (qty < 0)
+            {
+                dynamic sitem = GetShopItemData(name);
+                if (sitem != null)
+                    qty = MaximumShopBuys(sitem);
+                if (qty == 0)
+                {
+                    LogForm.Instance.devDebug($"[MaxBuy] Buy skipped due to max/requirement not meet");
+                    return;
+                }
+            }
+            Flash.Call("BuyItemQty", new string[] { name, qty.ToString() });
+        }
+        public static void BuyItemQty(int itemId, int shopItemId, int qty)
+        {
+            if (qty < 0)
+            {
+                dynamic sitem = GetShopItemData(itemId, shopItemId);
+                if (sitem != null)
+                    qty = MaximumShopBuys(sitem);
+                
+                if (qty == 0)
+                {
+                    LogForm.Instance.devDebug($"[MaxBuy] Buy skipped due to max/requirement not meet");
+                    return;
+                }
+            }
+            Flash.Call("BuyItemQtyById", new string[] { qty.ToString(), itemId.ToString(), shopItemId.ToString() });
+        }
+		
+        #region Maximum_buy_stuff
+        //code extracted from SKuA Corebots
+        private static dynamic GetShopItemData(int itemID, int shopItemID = 0)
+        {
+            return GetShopItemData(item =>
+            item?.ItemID == itemID,
+            shopItemID);
+        }
+        private static dynamic GetShopItemData(string itemName, int shopItemID = 0)
+        {
+            return GetShopItemData(item =>
+            itemName.EqualsIgnoreCase((string)item?.sName),
+            shopItemID);
+        }
+        private static int MaximumShopBuys(dynamic shopItem)
+        {
+            if (shopItem == null)
+                return 0;
+
+            var owned = Player.Inventory.Items.FirstOrDefault(x => x.Id == (int)shopItem.ItemID);
+
+            if ((string)shopItem.sES == "ar")
+                return 1;
+
+            int stackRemaining = owned != null
+                ? (int)shopItem.iStk - owned.Quantity
+                : (int)shopItem.iStk;
+
+            int perBuy = (int)shopItem.iQty;
+
+            // berapa kali bisa beli berdasarkan stack
+            int stackLimit = stackRemaining / perBuy;
+
+            if (stackLimit < 1)
+                return 0;
+
+            int maxBuys = stackLimit;
+
+            // ===== Currency Limit =====
+            if ((int)shopItem.iCost > 0)
+            {
+                int currency = (int)shopItem.bCoins == 1 ? Player.Coins : Player.Gold;
+                int currencyLimit = currency / (int)shopItem.iCost;
+
+                maxBuys = Math.Min(maxBuys, currencyLimit);
+            }
+
+            // ===== Quest Lock Limit =====
+            if (shopItem.iQSindex != null)
+            {
+                try
+                {
+                    int qsIndex = (int)shopItem.iQSindex;
+                    int qsValue = shopItem.iQSvalue != null ? (int)shopItem.iQSvalue : 0;
+                    if (qsIndex >= 0)
+                    {
+                        int currentVal = Flash.Instance.GetGameObject<int>($"world.getQuestValue({qsIndex})");
+                        if (currentVal < qsValue)
+                            return 0;
+                    }
+                }
+                catch { }
+            }
+
+            // ===== Merged Limit =====
+            if (shopItem.turnin != null)
+            {
+                foreach (var merge_req in shopItem.turnin)
+                {
+                    var material = Player.Inventory.Items
+                        .FirstOrDefault(x => x.Id == (int)merge_req.ItemID);
+
+                    if (material == null)
+                        return 0;
+
+                    int materialLimit = material.Quantity / (int)merge_req.iQty;
+
+                    if (materialLimit == 0)
+                        return 0;
+
+                    maxBuys = Math.Min(maxBuys, materialLimit);
+                }
+            }
+
+            // ===== Token Limit =====
+            if (shopItem.TokID != null && (int)shopItem.TokID > 0 && shopItem.TokQty != null && (double)shopItem.TokQty > 0)
+            {
+                int tokId = (int)shopItem.TokID;
+                double tokQty = (double)shopItem.TokQty;
+                var token = Player.Inventory.Items.FirstOrDefault(x => x.Id == tokId);
+                if (token == null)
+                    return 0;
+
+                int tokenLimit = (int)(token.Quantity / tokQty);
+                if (tokenLimit == 0)
+                    return 0;
+
+                maxBuys = Math.Min(maxBuys, tokenLimit);
+            }
+
+            // ===== Space Limit =====
+            if (owned == null && Player.Inventory.AvailableSlots <= 0)
+                return 0;
+
+            maxBuys *= perBuy;
+
+            return Math.Min(maxBuys, 100000);
+        }
+
+        public static List<string> GetUnmetPurchaseRequirements(dynamic shopItem, int quantity = -1)
+        {
+            List<string> missing = new List<string>();
+            if (shopItem == null)
+            {
+                missing.Add("Item is not in the loaded shop.");
+                return missing;
+            }
+
+            int bundle = shopItem.iQty != null ? Math.Max(1, (int)shopItem.iQty) : 1;
+            int purchased = quantity == -1 ? bundle : quantity;
+            int bundles = Math.Max(1, purchased / bundle);
+
+            if (shopItem.iQSindex != null && (int)shopItem.iQSindex >= 0)
+            {
+                try
+                {
+                    int qsIndex = (int)shopItem.iQSindex;
+                    int qsValue = shopItem.iQSvalue != null ? (int)shopItem.iQSvalue : 0;
+                    int currentVal = Flash.Instance.GetGameObject<int>($"world.getQuestValue({qsIndex})");
+                    if (currentVal < qsValue)
+                        missing.Add("Quest requirement not met.");
+                }
+                catch { }
+            }
+
+            if ((int)shopItem.iCost > 0)
+            {
+                int totalCost = (int)shopItem.iCost * bundles;
+                int currency = (int)shopItem.bCoins == 1 ? Player.Coins : Player.Gold;
+                if (currency < totalCost)
+                    missing.Add($"Missing currency: Need {totalCost}, Have {currency}");
+            }
+
+            if (shopItem.turnin != null)
+            {
+                foreach (var req in shopItem.turnin)
+                {
+                    int reqId = (int)req.ItemID;
+                    int reqQty = (int)req.iQty * bundles;
+                    var owned = Player.Inventory.Items.FirstOrDefault(x => x.Id == reqId);
+                    int have = owned != null ? owned.Quantity : 0;
+                    if (have < reqQty)
+                        missing.Add($"Missing {reqQty - have}x {req.sName ?? ("Item #" + reqId)} in inventory.");
+                }
+            }
+
+            if (shopItem.TokID != null && (int)shopItem.TokID > 0 && shopItem.TokQty != null && (double)shopItem.TokQty > 0)
+            {
+                int tokId = (int)shopItem.TokID;
+                int reqTokens = (int)((double)shopItem.TokQty * bundles);
+                var token = Player.Inventory.Items.FirstOrDefault(x => x.Id == tokId);
+                int have = token != null ? token.Quantity : 0;
+                if (have < reqTokens)
+                {
+                    string tokName = shopItem.TokName != null ? (string)shopItem.TokName : ("Token #" + tokId);
+                    missing.Add($"Missing {reqTokens - have}x {tokName} in inventory.");
+                }
+            }
+
+            var ownedItem = Player.Inventory.Items.FirstOrDefault(x => x.Id == (int)shopItem.ItemID);
+            if (ownedItem == null && Player.Inventory.AvailableSlots <= 0)
+            {
+                missing.Add("Inventory is full.");
+            }
+
+            return missing;
+        }
+        private static dynamic GetShopItemData(Func<dynamic, bool> match, int shopItemID = 0)
+        {
+            dynamic[] shopItems = Flash.Instance
+                .GetGameObject<dynamic[]>("world.shopinfo.items");
+
+            if (shopItems == null)
+                return null;
+
+            foreach (dynamic item in shopItems)
+            {
+                if (match(item) && (shopItemID == 0 || item?.ShopItemID == shopItemID))
+                {
+                    return item;
+                }
+            }
+
+            return null;
+        }
+        #endregion
+
+
+        public static void ResetShopInfo()
+        {
+            Flash.Call("ResetShopInfo", new string[0]);
+        }
+        private static int previousShop = 0;
+        public static void Load(int id)
+        {
+            if (previousShop != id)
+            {
+                ResetShopInfo();
+                previousShop = id;
+            }
+            Flash.Call("LoadShop", id.ToString());
+        }
+
+        public static void SellItem(string name)
+        {
+            var item = Player.Inventory.Items.Find(i => i.Name.EqualsIgnoreCase(name));
+            if (item != null && ClientConfig.ProtectFavorites && Player.Inventory.IsFavorited(item.Id))
+            {
+                LogForm.Instance.devDebug($"[ProtectFavorites] Skipped selling favorited item: {item.Name} ({item.Id})");
+                return;
+            }
+            Flash.Call("SellItem", name);
+        }
+        public static void SellItem(string name, int qty = 1)
+        {
+            var item = Player.Inventory.Items.Find(i => i.Name.EqualsIgnoreCase(name));
+            if (item == null)
+                return;
+
+            if (ClientConfig.ProtectFavorites && Player.Inventory.IsFavorited(item.Id))
+            {
+                LogForm.Instance.devDebug($"[ProtectFavorites] Skipped selling favorited item: {item.Name} ({item.Id})");
+                return;
+            }
+
+            if (qty <= 0)
+                qty += item.Quantity; // 0 = sell whole stack, -1 = Leave 1 stack
+            if (qty > 0)
+            {
+                _ = Proxy.Instance.SendToServer($"%xt%zm%sellItem%{World.RoomId}%{item.Id}%{qty}%");
+            }
+        }
+
+        public static void LoadHairShop(string id)
+        {
+            Flash.Call("LoadHairShop", id);
+        }
+
+        public static void LoadHairShop(int id)
+        {
+            Flash.Call("LoadHairShop", id.ToString());
+        }
+
+        public static void LoadArmorCustomizer()
+        {
+            Flash.Call("LoadArmorCustomizer", new string[0]);
+        }
+    }
+}
