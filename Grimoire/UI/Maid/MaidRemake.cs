@@ -116,7 +116,6 @@ namespace Grimoire.UI.Maid
             resetSpecials();
             bool toggle = cbEnablePlugin.Checked;
             // OptionsManager.SetSkipCutscenes();
-            OptionsManager.SetLagKiller(toggle);
             if (toggle)
             {
                 startUI();
