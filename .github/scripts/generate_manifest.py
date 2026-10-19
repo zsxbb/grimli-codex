@@ -24,7 +24,7 @@ def main():
 
     if os.path.isfile(manifest_path):
         try:
-            with open(manifest_path, "r", encoding="utf-8") as f:
+            with open(manifest_path, "r", encoding="utf-8-sig") as f:
                 old_data = json.load(f)
                 app_version = old_data.get("app_version", app_version)
                 app_download_url = old_data.get("app_download_url", app_download_url)
@@ -75,6 +75,10 @@ def main():
 
             sha256 = hashlib.sha256(normalized).hexdigest().upper()
 
+            # Parse file parts
+            base_name, ext = os.path.splitext(f)
+            parts = rel_path.split("/")
+
             # Determine credit (1. preserve existing, 2. read Author from .gbot, 3. folder fallback)
             credit = existing_credits.get(rel_path, "")
             if not credit and ext == ".gbot":
@@ -88,8 +92,6 @@ def main():
                 credit = "zsxbb"
 
             # Determine description
-            base_name, ext = os.path.splitext(f)
-            parts = rel_path.split("/")
             if rel_path in existing_descriptions:
                 desc = existing_descriptions[rel_path]
             elif rel_path in custom_descriptions:
