@@ -84,10 +84,57 @@ Script tersebut menyinkronkan 4 file sekaligus agar versi aplikasi konsisten:
 
 ## 📦 2. Otomatisasi Katalog Script Bank (`generate-manifest.yml`)
 
-Workflow ini bertugas memperbarui katalog script bot di **CodexBank**:
-- **Trigger**: Aktif otomatis saat Anda melakukan `push` file bot baru (misal `.gbot`) ke folder `CodexBank/`.
-- **Eksekusi**: Menjalankan `.github/scripts/generate_manifest.py` untuk memindai hash, nama file, ukuran, dan metadata bot.
-- **Commit**: Otomatis meng-commit kembali file `CodexBank/manifest.json` yang telah diperbarui ke branch `main`.
+Workflow ini bertugas memperbarui katalog script bot di **CodexBank** secara otomatis tanpa perlu mengedit `manifest.json` secara manual:
+
+- **Trigger**: Aktif otomatis saat Anda melakukan `push` file bot baru (misal `.gbot`, `.json`, `.txt`) ke folder `CodexBank/`.
+- **Eksekusi**: Menjalankan `.github/scripts/generate_manifest.py` di runner GitHub untuk memindai seluruh folder script.
+- **Commit**: Otomatis meng-commit kembali file `CodexBank/manifest.json` yang telah diperbarui ke branch `main` dengan pesan `chore(codexbank): auto-generate manifest.json [skip ci]`.
+
+---
+
+### ✨ Fitur Pintar Skrip Generator (`generate_manifest.py`)
+
+Skrip generator dirancang agar penambahan script bot sangat cepat dan bebas dari kesalahan manusia (*human error*):
+
+1. **Auto-Extract Author dari `.gbot`**:
+   - Jika file `.gbot` memiliki field `"Author"` di dalamnya (diisi saat membuat bot di Grimoire), generator akan **otomatis mengambil nama tersebut sebagai `credit`**.
+2. **Preserve Existing Credits**:
+   - Nilai `credit` yang sudah ada di `manifest.json` akan selalu dipertahankan.
+3. **Fallback Per Folder**:
+   - Jika field Author kosong, skrip memiliki aturan fallback otomatis berdasarkan folder (contoh: folder `Sea Voice` otomatis mendapat credit `"zsxbb"`).
+4. **LF-Normalized SHA-256 Hash**:
+   - Menghitung hash SHA-256 dengan normalisasi newline (`\r\n` -> `\n`) sehingga hash selalu konsisten antara Windows dan Linux, serta cocok 100% dengan fungsi verifikasi hash di `CodexBankManager.cs`.
+5. **Auto Description**:
+   - Membuat deskripsi quest bot otomatis berdasarkan nama file dan kategori (seperti Archmage, Darkon, Lae, Sea Voice, Ultra Boss, Maid config, dll).
+
+---
+
+### 📝 Alur Praktis Menambahkan Script Bot Baru:
+
+1. **Simpan Bot**: Letakkan file `.gbot` baru ke dalam subfolder yang sesuai di `CodexBank/` (misal: `CodexBank/Sea Voice/NamaBot.gbot`).
+2. **Pilih Salah Satu Metode Sinkronisasi**:
+   - **Metode A (Lokal - Rekomendasi sebelum push)**:
+     ```powershell
+     python .github/scripts/generate_manifest.py
+     ```
+     `manifest.json` akan terisi seketika. Lalu commit dan push seperti biasa:
+     ```powershell
+     git add CodexBank/
+     git commit -m "feat(codex): add new bot scripts"
+     git push origin main
+     ```
+   - **Metode B (Otomatis via Cloud)**:
+     Cukup commit & push file `.gbot` baru ke GitHub:
+     ```powershell
+     git add "CodexBank/Sea Voice/NamaBot.gbot"
+     git commit -m "feat(codex): add new Sea Voice bot"
+     git push origin main
+     ```
+     GitHub Actions (`generate-manifest.yml`) akan otomatis membuatkan entri `manifest.json` untuk Anda.
+
+> [!NOTE]
+> **Apakah perlu compile / build ulang `Grimoire.exe` saat menambah bot baru?**
+> **TIDAK PERLU.** Sistem Codex Bank bekerja secara dinamis melalui sinkronisasi cloud HTTPS langsung dari repository GitHub. Begitu file bot dan `manifest.json` ter-push ke branch `main`, semua pengguna `Grimoire.exe` langsung dapat melihat dan mengunduh bot baru melalui tombol **"Sync Scripts"**.
 
 ---
 

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 import os
 import json
 import hashlib
@@ -75,8 +75,17 @@ def main():
 
             sha256 = hashlib.sha256(normalized).hexdigest().upper()
 
-            # Determine credit (preserve from manifest, no hardcoded name)
+            # Determine credit (1. preserve existing, 2. read Author from .gbot, 3. folder fallback)
             credit = existing_credits.get(rel_path, "")
+            if not credit and ext == ".gbot":
+                try:
+                    gbot_data = json.loads(text)
+                    if isinstance(gbot_data, dict) and gbot_data.get("Author") and str(gbot_data["Author"]).strip():
+                        credit = str(gbot_data["Author"]).strip()
+                except Exception:
+                    pass
+            if not credit and "Sea Voice" in rel_path:
+                credit = "zsxbb"
 
             # Determine description
             base_name, ext = os.path.splitext(f)
@@ -95,6 +104,8 @@ def main():
                 desc = f"Lae Dark Knight quest bot: {base_name}."
             elif "Darkon" in rel_path:
                 desc = f"Darkon quest farm bot: {base_name}."
+            elif "Sea Voice" in rel_path:
+                desc = f"Sea Voice quest bot: {base_name}."
             elif "Ultra Boss" in rel_path:
                 boss_name = parts[1] if len(parts) > 2 else ""
                 desc = f"Ultra Boss bot: {base_name} ({boss_name}).".replace(" ().", ".")
