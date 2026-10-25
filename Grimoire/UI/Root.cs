@@ -104,6 +104,7 @@ namespace Grimoire.UI
         private System.Windows.Forms.ToolStripMenuItem appDetailMenuItem;
         private System.Windows.Forms.ToolStripMenuItem updateAppMenuItem;
         private System.Windows.Forms.ToolStripMenuItem syncScriptMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem uiSkinsMenuItem;
 
         //public AxShockwaveFlash Client => flashPlayer;
 
@@ -114,15 +115,18 @@ namespace Grimoire.UI
 
         public Root()
         {
+            UISkinManager.Init();
             this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
             InitializeComponent();
             this.CenterToScreen();
             Instance = this;
             this.Text = title;
+            UISkinManager.ApplyThemeToControl(this);
         }
 
         private void Root_Load(object sender, EventArgs e)
         {
+            UISkinManager.ApplyThemeToControl(this);
             //Task.Factory.StartNew(Proxy.Instance.Start, TaskCreationOptions.LongRunning);
             Flash.FlashError += (flashCtrl, ex, func, args) => {
                 try
@@ -135,6 +139,7 @@ namespace Grimoire.UI
             Hotkeys.Instance.LoadHotkeys();
             LoadPlugins();
             LoadCharSelect();
+            UISkinManager.ApplyThemeToControl(this);
             //auraClearer();
 
             // Periodic memory optimizer to clear Flash ActiveX leaks
@@ -557,6 +562,7 @@ namespace Grimoire.UI
             if (form.WindowState == FormWindowState.Minimized)
             {
                 form.WindowState = FormWindowState.Normal;
+                UISkinManager.ApplyThemeToControl(form);
                 form.Show();
                 form.BringToFront();
                 form.Focus();
@@ -567,6 +573,7 @@ namespace Grimoire.UI
                 form.Hide();
                 return;
             }
+            UISkinManager.ApplyThemeToControl(form);
             form.Show();
             form.BringToFront();
             form.Focus();
@@ -650,6 +657,7 @@ namespace Grimoire.UI
             this.walkspeedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
             this.enableOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.uiSkinsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.maidStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.codexStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.pluginsStrip = new System.Windows.Forms.ToolStripMenuItem();
@@ -1183,7 +1191,9 @@ namespace Grimoire.UI
             this.skipCutscenesToolStripMenuItem,
             this.disableAnimationsToolStripMenuItem,
             this.walkspeedToolStripMenuItem,
-            this.enableOptionsToolStripMenuItem});
+            this.enableOptionsToolStripMenuItem,
+            new System.Windows.Forms.ToolStripSeparator(),
+            this.uiSkinsMenuItem});
             this.optionsToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 23);
@@ -1309,6 +1319,15 @@ namespace Grimoire.UI
             this.enableOptionsToolStripMenuItem.Text = "Enable Options";
             this.enableOptionsToolStripMenuItem.Visible = false;
             this.enableOptionsToolStripMenuItem.Click += new System.EventHandler(this.enableOptionsToolStripMenuItem_Click);
+            // 
+            // uiSkinsMenuItem
+            // 
+            this.uiSkinsMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(46)))));
+            this.uiSkinsMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
+            this.uiSkinsMenuItem.Name = "uiSkinsMenuItem";
+            this.uiSkinsMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.uiSkinsMenuItem.Text = "UI Skins";
+            this.uiSkinsMenuItem.Click += new System.EventHandler(this.uiSkinsMenuItem_Click);
             // 
             // maidStrip
             // 
@@ -1642,6 +1661,12 @@ namespace Grimoire.UI
             }
         }
 
+        private void uiSkinsMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowForm(UISkinForm.Instance);
+            UISkinForm.Instance.SyncFromActiveColors();
+        }
+
         [DllImportAttribute("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
         [DllImportAttribute("user32.dll")]
@@ -1785,6 +1810,10 @@ namespace Grimoire.UI
 
         private void pluginAdded(object sender, ToolStripItemEventArgs e)
         {
+            if (e.Item != null)
+            {
+                UISkinManager.ApplyThemeToMenuItem(e.Item);
+            }
             pluginsStrip.DropDownItems.Add(e.Item);
         }
 
@@ -2234,9 +2263,29 @@ namespace Grimoire.UI
 }
 public class CustomDarkMenuRenderer : DarkMenuRenderer
 {
+    protected override void OnRenderToolStripBackground(ToolStripRenderEventArgs e)
+    {
+        using (SolidBrush brush = new SolidBrush(Grimoire.UI.UISkinManager.BaseColor))
+        {
+            e.Graphics.FillRectangle(brush, e.AffectedBounds);
+        }
+    }
+
     protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
     {
-        Color color = e.Item.Selected ? Colors.GreyHighlight : e.Item.BackColor;
+        Color color;
+        if (e.Item.Selected)
+        {
+            color = Grimoire.UI.UISkinManager.HoverColor;
+        }
+        else if (e.Item is ToolStripMenuItem mi && mi.DropDown.Visible)
+        {
+            color = Grimoire.UI.UISkinManager.HoverColor;
+        }
+        else
+        {
+            color = Grimoire.UI.UISkinManager.BaseColor;
+        }
 
         Rectangle rect = new Rectangle(2, 0, e.Item.Width - 2, e.Item.Height);
 

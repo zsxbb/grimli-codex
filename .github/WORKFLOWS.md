@@ -174,6 +174,10 @@ Apakah masih bisa build di komputer lokal? **Tentu saja, keduanya saling melengk
 
 ## 📋 Riwayat Versi & Changelog
 
+### v2.0.6
+* **New Custom Skins**: Option > UI Skins (Kustomisasi tema warna tombol, border, tab, dan preset tema).
+* **Fix / Tweak**: Disable "The Auto Lag Killer when Maid ON" (Rendering game tetap berjalan normal saat Maid aktif).
+
 ### v2.0.5
 * **New Feature (Skill Moments)**: Active Rules checkbox selection (aktifkan/nonaktifkan rule secara selektif dengan centang tanpa harus menghapus).
 * **New Feature (Loop Taunt)**: Pengganti Loop Aura dengan sistem built-in Taunt 1 & Taunt 2 (siklus rotasi 5 detik, opening manual untuk Taunt 1, anti-stop watchdog 10.5 detik).

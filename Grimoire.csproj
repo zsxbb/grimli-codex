@@ -292,6 +292,14 @@
     <Compile Include="Grimoire\UI\AppUpdateDialog.Designer.cs">
       <DependentUpon>AppUpdateDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Grimoire\UI\UISkinForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Grimoire\UI\UISkinForm.Designer.cs">
+      <DependentUpon>UISkinForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Grimoire\UI\UISkinManager.cs" />
+    <Compile Include="Grimoire\UI\ThemedTabControl.cs" />
     <Compile Include="Grimoire\Tools\CodexBankManager.cs" />
     <Compile Include="Grimoire\Tools\VoiceChatManager.cs" />
     <Compile Include="Grimoire\Tools\ClientConfig.cs" />

@@ -96,7 +96,7 @@ namespace Grimoire.Tools
 
         public const string MANIFEST_URL = "https://raw.githubusercontent.com/zsxbb/grimli-codex/main/CodexBank/manifest.json";
         public const string RAW_BASE_URL = "https://raw.githubusercontent.com/zsxbb/grimli-codex/main/CodexBank/";
-        public const string CURRENT_APP_VERSION = "2.0.5";
+        public const string CURRENT_APP_VERSION = "2.0.6";
 
         public string LocalBankDirectory => Path.Combine(Application.StartupPath, "Bots", "CodexBank");
 
@@ -494,6 +494,7 @@ namespace Grimoire.Tools
         }
     }
 }
+
 
 
 

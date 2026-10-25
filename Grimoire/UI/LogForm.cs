@@ -309,7 +309,7 @@ namespace Grimoire.UI
             this.btnSave = new DarkUI.Controls.DarkButton();
             this.btnStart = new DarkUI.Controls.DarkButton();
             this.btnStop = new DarkUI.Controls.DarkButton();
-            this.tabLogs = new FlatTabControl.FlatTabControl();
+            this.tabLogs = new ThemedTabControl();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.changeFontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.changeColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();

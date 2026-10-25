@@ -308,7 +308,7 @@ namespace Grimoire.UI
             this.lstItems = new System.Windows.Forms.ListBox();
             this.lstQuests = new System.Windows.Forms.ListBox();
             this.lstSkills = new System.Windows.Forms.ListBox();
-            this.mainTabControl = new FlatTabControl.FlatTabControl();
+            this.mainTabControl = new ThemedTabControl();
             this.tabCombat = new System.Windows.Forms.TabPage();
             this.darkGroupBox20 = new DarkUI.Controls.DarkGroupBox();
             this.txtSkillSet = new DarkUI.Controls.DarkTextBox();

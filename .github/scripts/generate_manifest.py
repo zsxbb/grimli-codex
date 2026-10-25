@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 import os
 import json
 import hashlib
@@ -15,10 +15,10 @@ def main():
         return
 
     # Preserve top-level app metadata and per-script metadata from existing manifest
-    app_version = "2.0.5"
+    app_version = "2.0.6"
     app_download_url = "https://github.com/zsxbb/grimli-codex/releases/latest/download/Grimoire.exe"
     app_release_url = "https://github.com/zsxbb/grimli-codex/releases/latest"
-    changelog = "Grimlite Li x CODEX v2.0.5 - Update: CODEX features: Skill Moment Choose Rules, Loop Taunt."
+    changelog = "Grimlite Li x CODEX v2.0.6 - New Custom Skins: Option > UI Skins; Disable 'The Auto Lag Killer when Maid ON'"
     existing_credits = {}
     existing_descriptions = {}
 
@@ -140,6 +140,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 

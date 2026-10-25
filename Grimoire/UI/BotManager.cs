@@ -191,6 +191,7 @@ namespace Grimoire.UI
             if (font != null)
                 this.Font = new Font(font, 8.25f, FontStyle.Regular, GraphicsUnit.Point, 0);
             ApplyDpiScaling();
+            UISkinManager.ApplyThemeToControl(this);
             try
             {
                 SendMessage(txtSearchBot.Handle, EM_SETCUEBANNER, 1, "Search bot...");
