@@ -1100,7 +1100,7 @@ namespace Grimoire.UI.Maid
             }
             else
             {
-                Root.Instance.maidStrip.ForeColor = Color.FromArgb(220, 220, 220);
+                Root.Instance.maidStrip.ForeColor = UISkinManager.TextColor;
                 lbStopAttackBg.BackColor = System.Drawing.Color.Transparent;
                 stopwatch.Stop();
                 this.Text = "Maid Codex";

@@ -100,7 +100,7 @@ namespace Grimoire.UI
         private System.Windows.Forms.ToolStripMenuItem loopEnrageMenuItem;
         private System.Windows.Forms.ToolStripMenuItem bypassMapMenuItem;
         private System.Windows.Forms.ToolStripMenuItem questPinnerMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem shopPinnerMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem alchemistMenuItem;
         private System.Windows.Forms.ToolStripMenuItem appDetailMenuItem;
         private System.Windows.Forms.ToolStripMenuItem updateAppMenuItem;
         private System.Windows.Forms.ToolStripMenuItem syncScriptMenuItem;
@@ -183,8 +183,11 @@ namespace Grimoire.UI
             });
         }
 
+        public bool IsAppUpdateAvailable { get; private set; } = false;
+
         public void SetUpdateNotification(bool available)
         {
+            IsAppUpdateAvailable = available;
             if (this.IsDisposed) return;
 
             if (this.InvokeRequired)
@@ -205,7 +208,7 @@ namespace Grimoire.UI
             }
             else
             {
-                Color defaultColor = Color.FromArgb(220, 220, 220);
+                Color defaultColor = UISkinManager.TextColor;
                 aboutToolStripMenuItem.ForeColor = defaultColor;
                 updateAppMenuItem.ForeColor = defaultColor;
             }
@@ -1404,15 +1407,16 @@ namespace Grimoire.UI
             this.questPinnerMenuItem.Click += new System.EventHandler(this.questPinnerMenuItem_Click);
             
             // 
-            // shopPinnerMenuItem
             // 
-            this.shopPinnerMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.shopPinnerMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(46)))));
-            this.shopPinnerMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
-            this.shopPinnerMenuItem.Name = "shopPinnerMenuItem";
-            this.shopPinnerMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.shopPinnerMenuItem.Text = "Shop Pinner";
-            this.shopPinnerMenuItem.Click += new System.EventHandler(this.shopPinnerMenuItem_Click);
+            // alchemistMenuItem
+            // 
+            this.alchemistMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.alchemistMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(46)))));
+            this.alchemistMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
+            this.alchemistMenuItem.Name = "alchemistMenuItem";
+            this.alchemistMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.alchemistMenuItem.Text = "Alchemist";
+            this.alchemistMenuItem.Click += new System.EventHandler(this.alchemistMenuItem_Click);
             
             this.codexStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.voiceChatMenuItem,
@@ -1420,7 +1424,7 @@ namespace Grimoire.UI
                 this.loopEnrageMenuItem,
                 this.bypassMapMenuItem,
                 this.questPinnerMenuItem,
-                this.shopPinnerMenuItem
+                this.alchemistMenuItem
             });
             // 
             // pluginsStrip
@@ -2205,9 +2209,9 @@ namespace Grimoire.UI
             ShowForm(QuestPinnerForm.Instance);
         }
 
-        private void shopPinnerMenuItem_Click(object sender, EventArgs e)
+        private void alchemistMenuItem_Click(object sender, EventArgs e)
         {
-            ShowForm(ShopPinnerForm.Instance);
+            ShowForm(AlchemistForm.Instance);
         }
 
 

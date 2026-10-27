@@ -1,8 +1,8 @@
 ﻿{
-    "app_version":  "2.0.6",
+    "app_version":  "2.0.7",
     "app_download_url":  "https://github.com/zsxbb/grimli-codex/releases/latest/download/Grimoire.exe",
     "app_release_url":  "https://github.com/zsxbb/grimli-codex/releases/latest",
-    "changelog":  "Grimlite Li x CODEX v2.0.6 - New Custom Skins: Option \u003e UI Skins; Disable \u0027The Auto Lag Killer when Maid ON\u0027",
+    "changelog":  "Grimlite Li x CODEX v2.0.7 - 1. NEW FEATURE: CODEX \u003e Alchemist: Auto Brew Potions; 2. Patch Fix Packet \u003e Sniffer.",
     "scripts":  [
                     {
                         "name":  "Archmage/1 Tapping Into the Arcane.gbot",

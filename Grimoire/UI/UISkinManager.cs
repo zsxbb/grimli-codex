@@ -151,6 +151,11 @@ namespace Grimoire.UI
                     ApplyThemeToControl(form);
                     form.Invalidate(true);
                 }
+
+                if (Root.Instance != null && !Root.Instance.IsDisposed)
+                {
+                    Root.Instance.SetUpdateNotification(Root.Instance.IsAppUpdateAvailable);
+                }
             }
             catch { }
         }
@@ -158,6 +163,32 @@ namespace Grimoire.UI
         public static void ApplyThemeToControl(Control ctrl)
         {
             if (ctrl == null) return;
+
+            if (ctrl.Name == "pnlMaterials" || ctrl.Name == "gbMaterials" ||
+                (ctrl.Parent != null && (ctrl.Parent.Name == "pnlMaterials" || ctrl.Parent.Name == "gbMaterials")))
+            {
+                if (ctrl is Panel pnl)
+                {
+                    pnl.BackColor = Color.FromArgb(30, 30, 36);
+                    pnl.Invalidate();
+                }
+                else if (ctrl is Button btn)
+                {
+                    btn.BackColor = Color.FromArgb(46, 46, 56);
+                    btn.ForeColor = Color.White;
+                    btn.Invalidate();
+                }
+                else if (ctrl is Label dl)
+                {
+                    if (dl.Name == "lblBoxHeader" || dl.Name == "lblCatalystTitle" ||
+                        dl.Name == "lblReagent1Title" || dl.Name == "lblReagent2Title" ||
+                        dl.Name == "lblMaxBrews")
+                    {
+                        dl.ForeColor = Color.White;
+                    }
+                }
+                return;
+            }
 
             if (ctrl is Form f)
             {

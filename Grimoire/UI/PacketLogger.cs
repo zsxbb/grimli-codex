@@ -77,7 +77,7 @@ namespace Grimoire.UI
             if (args == null || args.Length == 0 || args[0] == null)
                 return;
 
-            if (function == "packetFromClient" || function == "packetFromServer" || function == "pext")
+            if (function == "packetFromClient")
             {
                 string packet = args[0].ToString();
                 if (txtPackets.IsHandleCreated && !txtPackets.IsDisposed)

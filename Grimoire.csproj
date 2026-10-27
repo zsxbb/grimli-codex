@@ -250,11 +250,12 @@
     <Compile Include="Grimoire\UI\QuestPinnerForm.Designer.cs">
       <DependentUpon>QuestPinnerForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Grimoire\UI\ShopPinnerForm.cs">
+    <Compile Include="Grimoire\Tools\AlchemistData.cs" />
+    <Compile Include="Grimoire\UI\AlchemistForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Grimoire\UI\ShopPinnerForm.Designer.cs">
-      <DependentUpon>ShopPinnerForm.cs</DependentUpon>
+    <Compile Include="Grimoire\UI\AlchemistForm.Designer.cs">
+      <DependentUpon>AlchemistForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Grimoire\UI\Maid\WhitelistMap\WhitelistMap.cs">
       <SubType>Form</SubType>
