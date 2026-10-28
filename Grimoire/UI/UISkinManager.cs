@@ -20,6 +20,7 @@ namespace Grimoire.UI
         public static readonly Color DefaultPressed = Color.FromArgb(43, 43, 53);
         public static readonly Color DefaultBorder = Color.FromArgb(66, 66, 76);
         public static readonly Color DefaultText = Color.FromArgb(220, 220, 220);
+        public static readonly Color DefaultSecondaryText = Color.FromArgb(160, 160, 170);
 
         // Permanent default dark colors for inner Bot windows/lists
         public static readonly Color PermanentDarkBackground = Color.FromArgb(36, 36, 46);
@@ -33,6 +34,7 @@ namespace Grimoire.UI
         public static Color PressedColor { get; set; } = DefaultPressed;
         public static Color BorderColor { get; set; } = DefaultBorder;
         public static Color TextColor { get; set; } = DefaultText;
+        public static Color SecondaryTextColor { get; set; } = DefaultSecondaryText;
 
         private static readonly HashSet<int> KnownBaseArgb = new HashSet<int>
         {
@@ -57,6 +59,7 @@ namespace Grimoire.UI
                 PressedColor = ParseColor(c.Get("BtnPressedColor"), DefaultPressed);
                 BorderColor = ParseColor(c.Get("BtnBorderColor"), DefaultBorder);
                 TextColor = ParseColor(c.Get("BtnTextColor"), DefaultText);
+                SecondaryTextColor = ParseColor(c.Get("BtnSecondaryTextColor"), DefaultSecondaryText);
 
                 KnownBaseArgb.Add(BaseColor.ToArgb());
                 ApplyColorsToDarkUI();
@@ -64,7 +67,7 @@ namespace Grimoire.UI
             catch { }
         }
 
-        public static void Apply(Color baseColor, Color normal, Color hover, Color pressed, Color border, Color text, bool refreshUi = true)
+        public static void Apply(Color baseColor, Color normal, Color hover, Color pressed, Color border, Color text, Color secondaryText, bool refreshUi = true)
         {
             BaseColor = baseColor;
             NormalColor = normal;
@@ -72,6 +75,7 @@ namespace Grimoire.UI
             PressedColor = pressed;
             BorderColor = border;
             TextColor = text;
+            SecondaryTextColor = secondaryText;
 
             KnownBaseArgb.Add(baseColor.ToArgb());
             ApplyColorsToDarkUI();
@@ -82,11 +86,16 @@ namespace Grimoire.UI
             }
         }
 
-        public static void Save(Color baseColor, Color normal, Color hover, Color pressed, Color border, Color text)
+        public static void Apply(Color baseColor, Color normal, Color hover, Color pressed, Color border, Color text, bool refreshUi = true)
+        {
+            Apply(baseColor, normal, hover, pressed, border, text, SecondaryTextColor, refreshUi);
+        }
+
+        public static void Save(Color baseColor, Color normal, Color hover, Color pressed, Color border, Color text, Color secondaryText)
         {
             try
             {
-                Apply(baseColor, normal, hover, pressed, border, text, true);
+                Apply(baseColor, normal, hover, pressed, border, text, secondaryText, true);
 
                 Config c = Config.Load(ConfigPath);
                 c.Set("BtnBaseColor", baseColor.ToArgb().ToString("X8"));
@@ -95,14 +104,20 @@ namespace Grimoire.UI
                 c.Set("BtnPressedColor", pressed.ToArgb().ToString("X8"));
                 c.Set("BtnBorderColor", border.ToArgb().ToString("X8"));
                 c.Set("BtnTextColor", text.ToArgb().ToString("X8"));
+                c.Set("BtnSecondaryTextColor", secondaryText.ToArgb().ToString("X8"));
                 c.Save();
             }
             catch { }
         }
 
+        public static void Save(Color baseColor, Color normal, Color hover, Color pressed, Color border, Color text)
+        {
+            Save(baseColor, normal, hover, pressed, border, text, SecondaryTextColor);
+        }
+
         public static void ResetToDefault()
         {
-            Save(DefaultBase, DefaultNormal, DefaultHover, DefaultPressed, DefaultBorder, DefaultText);
+            Save(DefaultBase, DefaultNormal, DefaultHover, DefaultPressed, DefaultBorder, DefaultText, DefaultSecondaryText);
         }
 
         private static void ApplyColorsToDarkUI()
@@ -120,6 +135,7 @@ namespace Grimoire.UI
             SetColorField("DarkBlueBorder", BorderColor);
             SetColorField("LightBlueBorder", BorderColor);
             SetColorField("LightText", TextColor);
+            SetColorField("DisabledText", SecondaryTextColor);
             SetColorField("GreyHighlight", HoverColor);
             SetColorField("BlueHighlight", HoverColor);
             SetColorField("BlueSelection", HoverColor);
@@ -181,8 +197,7 @@ namespace Grimoire.UI
                 else if (ctrl is Label dl)
                 {
                     if (dl.Name == "lblBoxHeader" || dl.Name == "lblCatalystTitle" ||
-                        dl.Name == "lblReagent1Title" || dl.Name == "lblReagent2Title" ||
-                        dl.Name == "lblMaxBrews")
+                        dl.Name == "lblReagent1Title" || dl.Name == "lblReagent2Title")
                     {
                         dl.ForeColor = Color.White;
                     }
@@ -391,7 +406,8 @@ namespace Grimoire.UI
                 }
                 // Do not color preview panels in UISkinForm
                 else if (p.Name != "pnlBase" && p.Name != "pnlNormal" && p.Name != "pnlHover" &&
-                    p.Name != "pnlPressed" && p.Name != "pnlBorder" && p.Name != "pnlText")
+                    p.Name != "pnlPressed" && p.Name != "pnlBorder" && p.Name != "pnlText" &&
+                    p.Name != "pnlSecondaryText")
                 {
                     if (p.Name == "pnlMenuControls" || IsBaseColor(p.BackColor))
                     {

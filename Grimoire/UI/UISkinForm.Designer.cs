@@ -49,9 +49,14 @@ namespace Grimoire.UI
             this.pnlText = new System.Windows.Forms.Panel();
             this.lblTextHex = new DarkUI.Controls.DarkLabel();
             this.btnPickText = new DarkUI.Controls.DarkButton();
+            this.lblSecondaryText = new DarkUI.Controls.DarkLabel();
+            this.pnlSecondaryText = new System.Windows.Forms.Panel();
+            this.lblSecondaryTextHex = new DarkUI.Controls.DarkLabel();
+            this.btnPickSecondaryText = new DarkUI.Controls.DarkButton();
             this.grpPreview = new DarkUI.Controls.DarkGroupBox();
             this.btnPreview1 = new DarkUI.Controls.DarkButton();
             this.btnPreview2 = new DarkUI.Controls.DarkButton();
+            this.lblPreviewSecondary = new DarkUI.Controls.DarkLabel();
             this.btnApply = new DarkUI.Controls.DarkButton();
             this.btnSave = new DarkUI.Controls.DarkButton();
             this.btnReset = new DarkUI.Controls.DarkButton();
@@ -122,9 +127,13 @@ namespace Grimoire.UI
             this.pnlColors.Controls.Add(this.pnlText);
             this.pnlColors.Controls.Add(this.lblTextHex);
             this.pnlColors.Controls.Add(this.btnPickText);
+            this.pnlColors.Controls.Add(this.lblSecondaryText);
+            this.pnlColors.Controls.Add(this.pnlSecondaryText);
+            this.pnlColors.Controls.Add(this.lblSecondaryTextHex);
+            this.pnlColors.Controls.Add(this.btnPickSecondaryText);
             this.pnlColors.Location = new System.Drawing.Point(21, 74);
             this.pnlColors.Name = "pnlColors";
-            this.pnlColors.Size = new System.Drawing.Size(379, 204);
+            this.pnlColors.Size = new System.Drawing.Size(379, 236);
             this.pnlColors.TabIndex = 3;
             // 
             // lblBase
@@ -373,14 +382,56 @@ namespace Grimoire.UI
             this.btnPickText.Text = "Pick...";
             this.btnPickText.Click += new System.EventHandler(this.btnPickText_Click);
             // 
+            // lblSecondaryText
+            // 
+            this.lblSecondaryText.AutoSize = true;
+            this.lblSecondaryText.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
+            this.lblSecondaryText.Location = new System.Drawing.Point(12, 204);
+            this.lblSecondaryText.Name = "lblSecondaryText";
+            this.lblSecondaryText.Size = new System.Drawing.Size(86, 13);
+            this.lblSecondaryText.TabIndex = 24;
+            this.lblSecondaryText.Text = "Secondary Text:";
+            // 
+            // pnlSecondaryText
+            // 
+            this.pnlSecondaryText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pnlSecondaryText.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pnlSecondaryText.Location = new System.Drawing.Point(155, 200);
+            this.pnlSecondaryText.Name = "pnlSecondaryText";
+            this.pnlSecondaryText.Size = new System.Drawing.Size(42, 22);
+            this.pnlSecondaryText.TabIndex = 25;
+            this.pnlSecondaryText.Click += new System.EventHandler(this.btnPickSecondaryText_Click);
+            // 
+            // lblSecondaryTextHex
+            // 
+            this.lblSecondaryTextHex.AutoSize = true;
+            this.lblSecondaryTextHex.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSecondaryTextHex.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+            this.lblSecondaryTextHex.Location = new System.Drawing.Point(208, 204);
+            this.lblSecondaryTextHex.Name = "lblSecondaryTextHex";
+            this.lblSecondaryTextHex.Size = new System.Drawing.Size(56, 14);
+            this.lblSecondaryTextHex.TabIndex = 26;
+            this.lblSecondaryTextHex.Text = "#A0A0AA";
+            // 
+            // btnPickSecondaryText
+            // 
+            this.btnPickSecondaryText.Checked = false;
+            this.btnPickSecondaryText.Location = new System.Drawing.Point(292, 200);
+            this.btnPickSecondaryText.Name = "btnPickSecondaryText";
+            this.btnPickSecondaryText.Size = new System.Drawing.Size(72, 22);
+            this.btnPickSecondaryText.TabIndex = 27;
+            this.btnPickSecondaryText.Text = "Pick...";
+            this.btnPickSecondaryText.Click += new System.EventHandler(this.btnPickSecondaryText_Click);
+            // 
             // grpPreview
             // 
             this.grpPreview.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
             this.grpPreview.Controls.Add(this.btnPreview1);
             this.grpPreview.Controls.Add(this.btnPreview2);
-            this.grpPreview.Location = new System.Drawing.Point(21, 290);
+            this.grpPreview.Controls.Add(this.lblPreviewSecondary);
+            this.grpPreview.Location = new System.Drawing.Point(21, 322);
             this.grpPreview.Name = "grpPreview";
-            this.grpPreview.Size = new System.Drawing.Size(379, 78);
+            this.grpPreview.Size = new System.Drawing.Size(379, 86);
             this.grpPreview.TabIndex = 4;
             this.grpPreview.TabStop = false;
             this.grpPreview.Text = "Live Button Preview";
@@ -388,7 +439,7 @@ namespace Grimoire.UI
             // btnPreview1
             // 
             this.btnPreview1.Checked = false;
-            this.btnPreview1.Location = new System.Drawing.Point(18, 28);
+            this.btnPreview1.Location = new System.Drawing.Point(18, 24);
             this.btnPreview1.Name = "btnPreview1";
             this.btnPreview1.Size = new System.Drawing.Size(190, 32);
             this.btnPreview1.TabIndex = 0;
@@ -397,16 +448,27 @@ namespace Grimoire.UI
             // btnPreview2
             // 
             this.btnPreview2.Checked = true;
-            this.btnPreview2.Location = new System.Drawing.Point(222, 28);
+            this.btnPreview2.Location = new System.Drawing.Point(222, 24);
             this.btnPreview2.Name = "btnPreview2";
             this.btnPreview2.Size = new System.Drawing.Size(142, 32);
             this.btnPreview2.TabIndex = 1;
             this.btnPreview2.Text = "Checked State";
             // 
+            // lblPreviewSecondary
+            // 
+            this.lblPreviewSecondary.AutoSize = true;
+            this.lblPreviewSecondary.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPreviewSecondary.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(160)))), ((int)(((byte)(160)))), ((int)(((byte)(170)))));
+            this.lblPreviewSecondary.Location = new System.Drawing.Point(18, 62);
+            this.lblPreviewSecondary.Name = "lblPreviewSecondary";
+            this.lblPreviewSecondary.Size = new System.Drawing.Size(193, 13);
+            this.lblPreviewSecondary.TabIndex = 2;
+            this.lblPreviewSecondary.Text = "Sample secondary / placeholder text";
+            // 
             // btnApply
             // 
             this.btnApply.Checked = false;
-            this.btnApply.Location = new System.Drawing.Point(21, 382);
+            this.btnApply.Location = new System.Drawing.Point(21, 420);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(86, 26);
             this.btnApply.TabIndex = 5;
@@ -416,7 +478,7 @@ namespace Grimoire.UI
             // btnSave
             // 
             this.btnSave.Checked = false;
-            this.btnSave.Location = new System.Drawing.Point(118, 382);
+            this.btnSave.Location = new System.Drawing.Point(118, 420);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(86, 26);
             this.btnSave.TabIndex = 6;
@@ -426,7 +488,7 @@ namespace Grimoire.UI
             // btnReset
             // 
             this.btnReset.Checked = false;
-            this.btnReset.Location = new System.Drawing.Point(215, 382);
+            this.btnReset.Location = new System.Drawing.Point(215, 420);
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(86, 26);
             this.btnReset.TabIndex = 7;
@@ -436,7 +498,7 @@ namespace Grimoire.UI
             // btnClose
             // 
             this.btnClose.Checked = false;
-            this.btnClose.Location = new System.Drawing.Point(314, 382);
+            this.btnClose.Location = new System.Drawing.Point(314, 420);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(86, 26);
             this.btnClose.TabIndex = 8;
@@ -447,7 +509,7 @@ namespace Grimoire.UI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(422, 424);
+            this.ClientSize = new System.Drawing.Size(422, 462);
             this.Controls.Add(this.lblHeader);
             this.Controls.Add(this.lblPreset);
             this.Controls.Add(this.cbPresets);
@@ -501,9 +563,14 @@ namespace Grimoire.UI
         private System.Windows.Forms.Panel pnlText;
         private DarkUI.Controls.DarkLabel lblTextHex;
         private DarkUI.Controls.DarkButton btnPickText;
+        private DarkUI.Controls.DarkLabel lblSecondaryText;
+        private System.Windows.Forms.Panel pnlSecondaryText;
+        private DarkUI.Controls.DarkLabel lblSecondaryTextHex;
+        private DarkUI.Controls.DarkButton btnPickSecondaryText;
         private DarkUI.Controls.DarkGroupBox grpPreview;
         private DarkUI.Controls.DarkButton btnPreview1;
         private DarkUI.Controls.DarkButton btnPreview2;
+        private DarkUI.Controls.DarkLabel lblPreviewSecondary;
         private DarkUI.Controls.DarkButton btnApply;
         private DarkUI.Controls.DarkButton btnSave;
         private DarkUI.Controls.DarkButton btnReset;

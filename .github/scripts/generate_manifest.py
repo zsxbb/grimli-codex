@@ -18,7 +18,7 @@ def main():
     app_version = "2.0.8"
     app_download_url = "https://github.com/zsxbb/grimli-codex/releases/latest/download/Grimoire.exe"
     app_release_url = "https://github.com/zsxbb/grimli-codex/releases/latest"
-    changelog = "Grimlite Li x CODEX v2.0.8 - Update: Patch Alchemist: NewPackets and Cooldown, fvck you AE. sorry now need longer time to work on server-side."
+    changelog = "Grimlite Li x CODEX v2.0.8 - Patch Alchemist: Target potion pickup filter, clean UI layout, and custom secondary text color in UI Skin Manager"
     existing_credits = {}
     existing_descriptions = {}
 
@@ -140,6 +140,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 

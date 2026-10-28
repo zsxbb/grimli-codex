@@ -48,6 +48,44 @@ namespace Grimoire.UI
                 Color.FromArgb(66, 66, 76), ButtonBorderStyle.Solid);
         }
 
+        private readonly object _dropLock = new object();
+        private readonly List<Game.Data.InventoryItem> _droppedItemsThisBrew = new List<Game.Data.InventoryItem>();
+        private string _targetPotionName = "";
+
+        private void OnAlchemyDropReceived(Game.Data.InventoryItem drop)
+        {
+            if (drop == null || string.IsNullOrEmpty(drop.Name)) return;
+
+            // Ignore catalyst if returned/dropped
+            if (drop.Name.Equals(AlchemistData.DragonRunestoneName, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            // Auto-pickup drop ONLY if it matches the target potion
+            if (!string.IsNullOrEmpty(_targetPotionName) &&
+                drop.Name.Equals(_targetPotionName, StringComparison.OrdinalIgnoreCase))
+            {
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        await World.DropStack.GetDrop(drop.Id);
+                    }
+                    catch { }
+                });
+            }
+
+            // Always track in _droppedItemsThisBrew so it gets recorded in Done Total
+            lock (_dropLock)
+            {
+                _droppedItemsThisBrew.Add(new Game.Data.InventoryItem
+                {
+                    Id = drop.Id,
+                    Name = drop.Name,
+                    Quantity = drop.Quantity > 0 ? drop.Quantity : 1
+                });
+            }
+        }
+
         private void ApplyBoxDefaultDarkTheme()
         {
             pnlMaterials.BackColor = Color.FromArgb(30, 30, 36);
@@ -55,7 +93,7 @@ namespace Grimoire.UI
             lblCatalystTitle.ForeColor = Color.White;
             lblReagent1Title.ForeColor = Color.White;
             lblReagent2Title.ForeColor = Color.White;
-            lblMaxBrews.ForeColor = Color.White;
+            lblPotionTitle.ForeColor = Color.FromArgb(220, 220, 220);
 
             btnRefresh.BackColor = Color.FromArgb(46, 46, 56);
             btnRefresh.ForeColor = Color.White;
@@ -126,6 +164,21 @@ namespace Grimoire.UI
             UpdateMaterialStatus();
         }
 
+        private void rbTarget_CheckedChanged(object sender, EventArgs e)
+        {
+            var recipe = cmbPotions.SelectedItem as AlchemyRecipe;
+            if (recipe == null) return;
+
+            if (rbTargetPotion.Checked)
+            {
+                int curQty = GetInventoryItemQty(0, recipe.PotionName);
+                if (curQty > 0 && numTarget.Value <= curQty)
+                {
+                    numTarget.Value = Math.Min(numTarget.Maximum, curQty + 10);
+                }
+            }
+        }
+
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             Player.Inventory?.InvalidateCache();
@@ -138,18 +191,19 @@ namespace Grimoire.UI
 
             lblCatalystTitle.Text = "Dragon Runestone [7132]:";
             lblCatalystStatus.Text = "-";
-            lblCatalystStatus.ForeColor = Color.FromArgb(160, 160, 160);
+            lblCatalystStatus.ForeColor = UISkinManager.SecondaryTextColor;
 
             lblReagent1Title.Text = "Reagent 1:";
             lblReagent1Status.Text = "-";
-            lblReagent1Status.ForeColor = Color.FromArgb(160, 160, 160);
+            lblReagent1Status.ForeColor = UISkinManager.SecondaryTextColor;
 
             lblReagent2Title.Text = "Reagent 2:";
             lblReagent2Status.Text = "-";
-            lblReagent2Status.ForeColor = Color.FromArgb(160, 160, 160);
+            lblReagent2Status.ForeColor = UISkinManager.SecondaryTextColor;
 
-            lblMaxBrews.Text = "Current bag capacity: 0x Brew";
-            lblMaxBrews.ForeColor = Color.White;
+            lblPotionTitle.Text = "Potion in Bag:";
+            lblPotionStatus.Text = "-";
+            lblPotionStatus.ForeColor = UISkinManager.SecondaryTextColor;
         }
 
         private void UpdateMaterialStatus()
@@ -183,11 +237,12 @@ namespace Grimoire.UI
                 {
                     lblReagent2Title.Text = "Reagent 2: None";
                     lblReagent2Status.Text = "- [None]";
-                    lblReagent2Status.ForeColor = Color.FromArgb(160, 160, 160);
+                    lblReagent2Status.ForeColor = UISkinManager.SecondaryTextColor;
                 }
 
-                lblMaxBrews.Text = "Please log in to the game first.";
-                lblMaxBrews.ForeColor = Color.White;
+                lblPotionTitle.Text = "Potion in Bag:";
+                lblPotionStatus.Text = "-";
+                lblPotionStatus.ForeColor = UISkinManager.SecondaryTextColor;
                 return;
             }
 
@@ -242,13 +297,27 @@ namespace Grimoire.UI
             {
                 lblReagent2Title.Text = "Reagent 2: None";
                 lblReagent2Status.Text = "- [None]";
-                lblReagent2Status.ForeColor = Color.FromArgb(160, 160, 160);
+                lblReagent2Status.ForeColor = UISkinManager.SecondaryTextColor;
             }
 
-            // Capacity calculation
-            int maxPossible = Math.Min(runestoneQty, Math.Min(r1Qty, recipe.HasReagent2 ? r2Qty : r1Qty));
-            lblMaxBrews.Text = $"Current bag capacity: {maxPossible}x Brew";
-            lblMaxBrews.ForeColor = Color.White;
+            // 4. Target Potion in Bag (Detect ID & Quantity)
+            var invItems = Player.Inventory?.Items;
+            var potItem = invItems?.FirstOrDefault(i => i.Name.Equals(recipe.PotionName, StringComparison.OrdinalIgnoreCase));
+            int potQty = potItem?.Quantity ?? 0;
+            int potId = potItem?.Id ?? 0;
+
+            if (potItem != null && potQty > 0)
+            {
+                lblPotionTitle.Text = $"Potion in Bag [{potId}]:";
+                lblPotionStatus.Text = $"{potQty}";
+                lblPotionStatus.ForeColor = Color.FromArgb(100, 220, 100);
+            }
+            else
+            {
+                lblPotionTitle.Text = "Potion in Bag:";
+                lblPotionStatus.Text = "0";
+                lblPotionStatus.ForeColor = UISkinManager.SecondaryTextColor;
+            }
         }
 
         private int GetInventoryItemQty(int itemId, string itemName)
@@ -314,27 +383,51 @@ namespace Grimoire.UI
                 return;
             }
 
+            bool isTargetPotion = rbTargetPotion.Checked;
             int targetCount = (int)numTarget.Value;
             if (targetCount <= 0) targetCount = 1;
+
+            int currentInBag = GetInventoryItemQty(0, recipe.PotionName);
+            if (isTargetPotion && currentInBag >= targetCount)
+            {
+                MessageBox.Show(
+                    $"Potion in bag ({currentInBag}) already meets or exceeds target ({targetCount})!",
+                    "CODEX Alchemist",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
 
             _isBrewing = true;
             btnStartStop.Text = "STOP BREWING";
             btnStartStop.ForeColor = Color.FromArgb(255, 120, 120);
             txtSearch.Enabled = false;
             cmbPotions.Enabled = false;
+            rbTargetBrew.Enabled = false;
+            rbTargetPotion.Enabled = false;
             numTarget.Enabled = false;
             chkStopIfOut.Enabled = false;
             btnRefresh.Enabled = false;
 
-            progressBar.Minimum = 0;
-            progressBar.Maximum = targetCount;
-            progressBar.Value = 0;
-            lblStatus.Text = $"Status: Starting brewing (Target: {targetCount})...";
+            if (isTargetPotion)
+            {
+                progressBar.Minimum = Math.Min(currentInBag, targetCount);
+                progressBar.Maximum = targetCount;
+                progressBar.Value = Math.Min(currentInBag, targetCount);
+                lblStatus.Text = $"Status: Starting brewing (Target: {targetCount} in bag)...";
+            }
+            else
+            {
+                progressBar.Minimum = 0;
+                progressBar.Maximum = targetCount;
+                progressBar.Value = 0;
+                lblStatus.Text = $"Status: Starting brewing (Target: {targetCount} brews)...";
+            }
 
             _cts = new CancellationTokenSource();
             CancellationToken token = _cts.Token;
 
-            Task.Run(() => RunBrewLoop(recipe, targetCount, token));
+            Task.Run(() => RunBrewLoop(recipe, targetCount, isTargetPotion, token));
         }
 
         private void StopBrewing()
@@ -346,41 +439,75 @@ namespace Grimoire.UI
             }
         }
 
-        private async Task RunBrewLoop(AlchemyRecipe recipe, int targetCount, CancellationToken token)
+        private async Task RunBrewLoop(AlchemyRecipe recipe, int targetVal, bool isTargetPotion, CancellationToken token)
         {
-            int current = 0;
+            int totalBrews = 0;
             string stopReason = "";
+            var sessionGained = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
             try
             {
+                _targetPotionName = recipe.PotionName;
+                // Hook drop listener to detect drops and auto-pickup target potion
+                World.ItemDropped += OnAlchemyDropReceived;
+
                 int.TryParse(recipe.Reagent1Id, out int r1Id);
                 int.TryParse(recipe.Reagent2Id, out int r2Id);
 
-                while (current < targetCount)
+                while (true)
                 {
                     if (token.IsCancellationRequested || !Player.IsLoggedIn)
                         break;
 
+                    Player.Inventory?.InvalidateCache();
+                    int currentInBag = GetInventoryItemQty(0, recipe.PotionName);
+
+                    if (isTargetPotion && currentInBag >= targetVal)
+                        break;
+
+                    if (!isTargetPotion && totalBrews >= targetVal)
+                        break;
+
                     if (chkStopIfOut.Checked)
                     {
-                        Player.Inventory?.InvalidateCache();
                         int runestones = GetInventoryItemQty(AlchemistData.DragonRunestoneId, AlchemistData.DragonRunestoneName);
                         int r1 = GetInventoryItemQty(r1Id, recipe.Reagent1);
                         int r2 = recipe.HasReagent2 ? GetInventoryItemQty(r2Id, recipe.Reagent2) : 999;
 
                         if (runestones < 1 || r1 < 1 || r2 < 1)
                         {
-                            stopReason = "Out of materials in inventory";
+                            stopReason = "Out of materials";
                             break;
                         }
                     }
 
-                    int brewStep = current + 1;
+                    int brewStep = totalBrews + 1;
+
+                    // Clear drop tracker for this brew iteration
+                    lock (_dropLock)
+                    {
+                        _droppedItemsThisBrew.Clear();
+                    }
+
+                    // Take snapshot of inventory before mix
+                    var itemsBefore = Player.Inventory?.Items?.ToList() ?? new List<Game.Data.InventoryItem>();
+                    var qtyBeforeById = new Dictionary<int, int>();
+                    var qtyBeforeByName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var it in itemsBefore)
+                    {
+                        if (it == null) continue;
+                        qtyBeforeById[it.Id] = it.Quantity;
+                        if (!string.IsNullOrEmpty(it.Name))
+                            qtyBeforeByName[it.Name] = it.Quantity;
+                    }
 
                     // 1. Packet START
                     SafeInvoke(() =>
                     {
-                        lblStatus.Text = $"[{brewStep}/{targetCount}] Starting mix: {recipe.PotionName}...";
+                        if (isTargetPotion)
+                            lblStatus.Text = $"[Brew #{brewStep}] Starting mix: {recipe.PotionName}...\r\nBag: {currentInBag}/{targetVal}";
+                        else
+                            lblStatus.Text = $"[{brewStep}/{targetVal}] Starting mix: {recipe.PotionName}...\r\nBag: {currentInBag}";
                     });
 
                     await Proxy.Instance.SendToServer(recipe.GetPacketStart());
@@ -392,7 +519,10 @@ namespace Grimoire.UI
                         int remainingSec = sec;
                         SafeInvoke(() =>
                         {
-                            lblStatus.Text = $"[{brewStep}/{targetCount}] Mixing in progress... {remainingSec}s remaining";
+                            if (isTargetPotion)
+                                lblStatus.Text = $"[Brew #{brewStep}] Mixing in progress... {remainingSec}s remaining\r\nBag: {currentInBag}/{targetVal}";
+                            else
+                                lblStatus.Text = $"[{brewStep}/{targetVal}] Mixing in progress... {remainingSec}s remaining\r\nBag: {currentInBag}";
                         });
                         await Task.Delay(1000, token);
                     }
@@ -401,36 +531,125 @@ namespace Grimoire.UI
                     // 2. Packet COMPLETE (alchDone)
                     SafeInvoke(() =>
                     {
-                        lblStatus.Text = $"[{brewStep}/{targetCount}] Completing mix (alchDone)...";
+                        lblStatus.Text = "Completing mix (alchDone)...\r\nWaiting for server drops...";
                     });
 
                     await Proxy.Instance.SendToServer(recipe.GetPacketComplete());
 
-                    current++;
+                    // Allow time for server to respond with drop packets
+                    await Task.Delay(1200, token);
+
+                    // Ensure targeted potion in World.DropStack is picked up
+                    try
+                    {
+                        var remainingDrops = World.DropStack?.ToList();
+                        if (remainingDrops != null && remainingDrops.Count > 0)
+                        {
+                            foreach (var d in remainingDrops)
+                            {
+                                if (d == null) continue;
+                                if (d.Name.Equals(recipe.PotionName, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    await World.DropStack.GetDrop(d.Id);
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+
+                    // Brief pause for pickups to finalize in inventory
+                    await Task.Delay(600, token);
+
+                    Player.Inventory?.InvalidateCache();
+                    var itemsAfter = Player.Inventory?.Items?.ToList() ?? new List<Game.Data.InventoryItem>();
+
+                    // Tally all gains from this brew
+                    var stepTally = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+                    // 1. Check inventory diff
+                    foreach (var item in itemsAfter)
+                    {
+                        if (item == null || string.IsNullOrEmpty(item.Name)) continue;
+                        int prevQty = 0;
+                        if (qtyBeforeById.TryGetValue(item.Id, out int q))
+                            prevQty = q;
+                        else if (qtyBeforeByName.TryGetValue(item.Name, out int qn))
+                            prevQty = qn;
+
+                        int gained = item.Quantity - prevQty;
+                        if (gained > 0 &&
+                            !item.Name.Equals(AlchemistData.DragonRunestoneName, StringComparison.OrdinalIgnoreCase) &&
+                            !item.Name.Equals(recipe.Reagent1, StringComparison.OrdinalIgnoreCase) &&
+                            (!recipe.HasReagent2 || !item.Name.Equals(recipe.Reagent2, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            stepTally[item.Name] = gained;
+                        }
+                    }
+
+                    // 2. Also incorporate any dropped items captured by World.ItemDropped
+                    lock (_dropLock)
+                    {
+                        foreach (var drop in _droppedItemsThisBrew)
+                        {
+                            if (drop == null || string.IsNullOrEmpty(drop.Name)) continue;
+                            if (!stepTally.ContainsKey(drop.Name))
+                            {
+                                stepTally[drop.Name] = drop.Quantity > 0 ? drop.Quantity : 1;
+                            }
+                        }
+                    }
+
+                    // Accumulate into overall session tracker
+                    List<string> stepGains = new List<string>();
+                    foreach (var kvp in stepTally)
+                    {
+                        if (!sessionGained.ContainsKey(kvp.Key))
+                            sessionGained[kvp.Key] = 0;
+                        sessionGained[kvp.Key] += kvp.Value;
+                        stepGains.Add($"{kvp.Key}: +{kvp.Value}");
+                    }
+
+                    totalBrews++;
+                    currentInBag = GetInventoryItemQty(0, recipe.PotionName);
 
                     SafeInvoke(() =>
                     {
-                        progressBar.Value = Math.Min(current, targetCount);
-                        lblStatus.Text = $"Status: {current}/{targetCount} brewed.";
-                        Player.Inventory?.InvalidateCache();
+                        if (isTargetPotion)
+                        {
+                            progressBar.Value = Math.Min(Math.Max(currentInBag, progressBar.Minimum), progressBar.Maximum);
+                        }
+                        else
+                        {
+                            progressBar.Value = Math.Min(totalBrews, progressBar.Maximum);
+                        }
+
+                        string stepGainText = stepGains.Count > 0 ? string.Join(", ", stepGains) : "+0 pot";
+                        if (isTargetPotion)
+                            lblStatus.Text = $"[Brew #{totalBrews}] {stepGainText}\r\nBag: {currentInBag}/{targetVal}";
+                        else
+                            lblStatus.Text = $"[{totalBrews}/{targetVal}] {stepGainText}\r\nBag: {currentInBag}";
+
                         UpdateMaterialStatus();
                     });
 
+                    // Check if target condition reached
+                    if (isTargetPotion && currentInBag >= targetVal)
+                        break;
+                    if (!isTargetPotion && totalBrews >= targetVal)
+                        break;
+
                     // Cooldown 2 seconds before next mix if more remain
-                    if (current < targetCount)
+                    for (int cd = 2; cd > 0; cd--)
                     {
-                        for (int cd = 2; cd > 0; cd--)
-                        {
-                            if (token.IsCancellationRequested) break;
-                            int remainingCd = cd;
-                            SafeInvoke(() =>
-                            {
-                                lblStatus.Text = $"[{current}/{targetCount}] Cooldown before next mix: {remainingCd}s...";
-                            });
-                            await Task.Delay(1000, token);
-                        }
                         if (token.IsCancellationRequested) break;
+                        int remainingCd = cd;
+                        SafeInvoke(() =>
+                        {
+                            lblStatus.Text = $"Cooldown before next mix: {remainingCd}s...\r\nBag: {currentInBag}";
+                        });
+                        await Task.Delay(1000, token);
                     }
+                    if (token.IsCancellationRequested) break;
                 }
             }
             catch (TaskCanceledException)
@@ -443,6 +662,9 @@ namespace Grimoire.UI
             }
             finally
             {
+                World.ItemDropped -= OnAlchemyDropReceived;
+                _targetPotionName = "";
+
                 SafeInvoke(() =>
                 {
                     _isBrewing = false;
@@ -450,6 +672,8 @@ namespace Grimoire.UI
                     btnStartStop.ForeColor = Color.FromArgb(220, 220, 220);
                     txtSearch.Enabled = true;
                     cmbPotions.Enabled = true;
+                    rbTargetBrew.Enabled = true;
+                    rbTargetPotion.Enabled = true;
                     numTarget.Enabled = true;
                     chkStopIfOut.Enabled = true;
                     btnRefresh.Enabled = true;
@@ -457,20 +681,33 @@ namespace Grimoire.UI
                     Player.Inventory?.InvalidateCache();
                     UpdateMaterialStatus();
 
-                    if (!string.IsNullOrEmpty(stopReason))
-                    {
-                        lblStatus.Text = $"Status: {stopReason} ({current}/{targetCount} completed).";
-                    }
-                    else if (current >= targetCount)
-                    {
-                        lblStatus.Text = $"Status: Finished! Successfully brewed {current} potions.";
-                    }
-                    else
-                    {
-                        lblStatus.Text = $"Status: Finished ({current}/{targetCount}).";
-                    }
+                    lblStatus.Text = BuildDoneSummary(stopReason, sessionGained, totalBrews);
                 });
             }
+        }
+
+        private string BuildDoneSummary(string stopReason, Dictionary<string, int> sessionGained, int totalBrews)
+        {
+            var sb = new System.Text.StringBuilder();
+            if (!string.IsNullOrEmpty(stopReason))
+            {
+                sb.AppendLine(stopReason);
+            }
+
+            sb.AppendLine("Done Total:");
+            if (sessionGained.Count > 0)
+            {
+                foreach (var kvp in sessionGained)
+                {
+                    sb.AppendLine($"{kvp.Key}: +{kvp.Value}");
+                }
+            }
+            else
+            {
+                sb.AppendLine("No potions gained");
+            }
+            sb.Append($"{totalBrews} brew{(totalBrews == 1 ? "" : "s")}");
+            return sb.ToString();
         }
 
         private void SafeInvoke(Action action)

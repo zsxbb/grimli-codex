@@ -16,6 +16,7 @@ namespace Grimoire.UI
         private Color _curPressed;
         private Color _curBorder;
         private Color _curText;
+        private Color _curSecondaryText;
         private bool _suppressPresetChange = false;
 
         private class ThemePreset
@@ -27,6 +28,7 @@ namespace Grimoire.UI
             public Color Pressed { get; set; }
             public Color Border { get; set; }
             public Color Text { get; set; }
+            public Color SecondaryText { get; set; }
 
             public override string ToString() => Name;
         }
@@ -41,7 +43,8 @@ namespace Grimoire.UI
                 Hover = Color.Empty,
                 Pressed = Color.Empty,
                 Border = Color.Empty,
-                Text = Color.Empty
+                Text = Color.Empty,
+                SecondaryText = Color.Empty
             },
             new ThemePreset
             {
@@ -51,7 +54,8 @@ namespace Grimoire.UI
                 Hover = Color.FromArgb(90, 90, 100),
                 Pressed = Color.FromArgb(43, 43, 53),
                 Border = Color.FromArgb(66, 66, 76),
-                Text = Color.FromArgb(220, 220, 220)
+                Text = Color.FromArgb(220, 220, 220),
+                SecondaryText = Color.FromArgb(160, 160, 170)
             },
             new ThemePreset
             {
@@ -61,7 +65,8 @@ namespace Grimoire.UI
                 Hover = Color.FromArgb(86, 60, 125),
                 Pressed = Color.FromArgb(37, 26, 54),
                 Border = Color.FromArgb(138, 87, 216),
-                Text = Color.FromArgb(241, 233, 255)
+                Text = Color.FromArgb(241, 233, 255),
+                SecondaryText = Color.FromArgb(180, 165, 205)
             },
             new ThemePreset
             {
@@ -71,7 +76,8 @@ namespace Grimoire.UI
                 Hover = Color.FromArgb(245, 37, 125),
                 Pressed = Color.FromArgb(239, 23, 244),
                 Border = Color.FromArgb(135, 22, 135),
-                Text = Color.FromArgb(64, 0, 2)
+                Text = Color.FromArgb(64, 0, 2),
+                SecondaryText = Color.FromArgb(130, 40, 70)
             },
             new ThemePreset
             {
@@ -81,7 +87,8 @@ namespace Grimoire.UI
                 Hover = Color.FromArgb(44, 92, 67),
                 Pressed = Color.FromArgb(19, 38, 28),
                 Border = Color.FromArgb(46, 139, 87),
-                Text = Color.FromArgb(230, 255, 240)
+                Text = Color.FromArgb(230, 255, 240),
+                SecondaryText = Color.FromArgb(140, 185, 160)
             },
             new ThemePreset
             {
@@ -91,7 +98,8 @@ namespace Grimoire.UI
                 Hover = Color.FromArgb(97, 45, 54),
                 Pressed = Color.FromArgb(41, 19, 23),
                 Border = Color.FromArgb(197, 48, 48),
-                Text = Color.FromArgb(255, 235, 235)
+                Text = Color.FromArgb(255, 235, 235),
+                SecondaryText = Color.FromArgb(195, 150, 155)
             },
             new ThemePreset
             {
@@ -101,7 +109,8 @@ namespace Grimoire.UI
                 Hover = Color.FromArgb(44, 44, 52),
                 Pressed = Color.FromArgb(20, 20, 24),
                 Border = Color.FromArgb(68, 68, 80),
-                Text = Color.FromArgb(245, 245, 245)
+                Text = Color.FromArgb(245, 245, 245),
+                SecondaryText = Color.FromArgb(150, 150, 155)
             }
         };
 
@@ -146,6 +155,7 @@ namespace Grimoire.UI
             _curPressed = UISkinManager.PressedColor;
             _curBorder = UISkinManager.BorderColor;
             _curText = UISkinManager.TextColor;
+            _curSecondaryText = UISkinManager.SecondaryTextColor;
 
             DetectPreset();
             UpdateUiElements();
@@ -164,7 +174,8 @@ namespace Grimoire.UI
                     ColorsEqual(p.Hover, _curHover) &&
                     ColorsEqual(p.Pressed, _curPressed) &&
                     ColorsEqual(p.Border, _curBorder) &&
-                    ColorsEqual(p.Text, _curText))
+                    ColorsEqual(p.Text, _curText) &&
+                    ColorsEqual(p.SecondaryText, _curSecondaryText))
                 {
                     matchedIndex = i;
                     break;
@@ -202,6 +213,10 @@ namespace Grimoire.UI
             pnlText.BackColor = _curText;
             lblTextHex.Text = UISkinManager.ColorToHex(_curText);
 
+            pnlSecondaryText.BackColor = _curSecondaryText;
+            lblSecondaryTextHex.Text = UISkinManager.ColorToHex(_curSecondaryText);
+            lblPreviewSecondary.ForeColor = _curSecondaryText;
+
             cbPresets.BorderColor = _curBorder;
             cbPresets.ButtonColor = _curNormal;
             cbPresets.Invalidate();
@@ -222,9 +237,10 @@ namespace Grimoire.UI
                 _curPressed = preset.Pressed;
                 _curBorder = preset.Border;
                 _curText = preset.Text;
+                _curSecondaryText = preset.SecondaryText;
 
                 UpdateUiElements();
-                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, true);
+                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, _curSecondaryText, true);
             }
         }
 
@@ -238,7 +254,7 @@ namespace Grimoire.UI
                 cbPresets.SelectedIndex = 0; // (Custom)
                 _suppressPresetChange = false;
                 UpdateUiElements();
-                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, true);
+                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, _curSecondaryText, true);
             }
         }
 
@@ -252,7 +268,7 @@ namespace Grimoire.UI
                 cbPresets.SelectedIndex = 0; // (Custom)
                 _suppressPresetChange = false;
                 UpdateUiElements();
-                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, true);
+                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, _curSecondaryText, true);
             }
         }
 
@@ -266,7 +282,7 @@ namespace Grimoire.UI
                 cbPresets.SelectedIndex = 0; // (Custom)
                 _suppressPresetChange = false;
                 UpdateUiElements();
-                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, true);
+                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, _curSecondaryText, true);
             }
         }
 
@@ -280,7 +296,7 @@ namespace Grimoire.UI
                 cbPresets.SelectedIndex = 0; // (Custom)
                 _suppressPresetChange = false;
                 UpdateUiElements();
-                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, true);
+                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, _curSecondaryText, true);
             }
         }
 
@@ -294,7 +310,7 @@ namespace Grimoire.UI
                 cbPresets.SelectedIndex = 0; // (Custom)
                 _suppressPresetChange = false;
                 UpdateUiElements();
-                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, true);
+                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, _curSecondaryText, true);
             }
         }
 
@@ -308,18 +324,32 @@ namespace Grimoire.UI
                 cbPresets.SelectedIndex = 0; // (Custom)
                 _suppressPresetChange = false;
                 UpdateUiElements();
-                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, true);
+                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, _curSecondaryText, true);
+            }
+        }
+
+        private void btnPickSecondaryText_Click(object sender, EventArgs e)
+        {
+            colorDialog1.Color = _curSecondaryText;
+            if (colorDialog1.ShowDialog(this) == DialogResult.OK)
+            {
+                _curSecondaryText = colorDialog1.Color;
+                _suppressPresetChange = true;
+                cbPresets.SelectedIndex = 0; // (Custom)
+                _suppressPresetChange = false;
+                UpdateUiElements();
+                UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, _curSecondaryText, true);
             }
         }
 
         private void btnApply_Click(object sender, EventArgs e)
         {
-            UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, true);
+            UISkinManager.Apply(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, _curSecondaryText, true);
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            UISkinManager.Save(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText);
+            UISkinManager.Save(_curBase, _curNormal, _curHover, _curPressed, _curBorder, _curText, _curSecondaryText);
             DarkMessageBox.Show(this, "Skin settings successfully saved to config!", "UI Skins", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
