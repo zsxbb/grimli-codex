@@ -176,6 +176,17 @@ Apakah masih bisa build di komputer lokal? **Tentu saja, keduanya saling melengk
 
 ## 📋 Riwayat Versi & Changelog
 
+### v2.0.9
+* **Alchemist (Auto Brew)**:
+  * Filter auto-pickup khusus potion yang ditargetkan (non-target byproduct potions dibiarkan di game tanpa di-pickup).
+  * Potion byproduct yang drop tetap terdeteksi dan tercatat akurat pada rangkuman `Done Total:`.
+  * Status "Potion in Bag" dipindahkan ke bawah combobox dengan tampilan jumlah bersih tanpa tag `[READY]` atau `[None]`.
+  * Pembersihan label kapasitas bag yang tidak diperlukan.
+* **UI Skin Manager**:
+  * Fitur baru kustomisasi **Secondary Text Color** (default `#A0A0AA`), tersimpan di `config.cfg` sebagai `BtnSecondaryTextColor`.
+  * Integrasi secondary text ke tema DarkUI serta label status.
+  * Penambahan baris picker ke-7 pada UI Skins form dan pembaruan seluruh Theme Presets.
+
 ### v2.0.8
 * **Patch (Alchemy: NewPackets & Cooldown)**: Update packet post-patch AQW Chemicotron (`alchStart` & `alchDone`) dan penyesuaian server-side cooldown delay (18s mixing wait & 2s cooldown).
 * **Note**: Update: Patch Alchemist: NewPackets and Cooldown, fvck you AE. sorry now need longer time to work on server-side.
