@@ -1,24 +1,26 @@
-# AQW Alchemy Packet Formula Documentation
+# AQW Alchemy Packet Formula Documentation (Post-Patch Update)
 
-Dokumentasi rumus formula packet alchemy (*START* & *COMPLETE*) yang diambil dari modul frontend [`templates/modules/alchemy.html`](file:///pxnda/sakib.my.id/aqw/templates/modules/alchemy.html) dan logika JavaScript di [`static/js/modules/alchemy.js`](file:///pxnda/sakib.my.id/aqw/static/js/modules/alchemy.js), yang dipetakan langsung dengan dataset [`database/packet_alchemy.json`](file:///pxnda/sakib.my.id/aqw/database/packet_alchemy.json).
+Dokumentasi rumus formula packet alchemy (*START* & *COMPLETE*) yang diperbarui setelah update/patch sistem Alchemy AQW (Chemicotron interface), dipetakan langsung dengan dataset [`database/packet_alchemy.json`](file:///pxnda/sakib.my.id/aqw/database/packet_alchemy.json).
 
 ---
 
 ## 1. Format Formula Packet
 
-Setiap proses brewing potion menggunakan dua packet yang dikirimkan secara berurutan:
+Setiap proses brewing potion menggunakan dua packet yang dikirimkan secara berurutan dengan jeda waktu server-side validation:
 
-### A. Packet START (`getAlchWait`)
-Memberi tahu server untuk memulai proses brewing dan mengunci reagen pada wadah alchemy.
+### A. Packet START (`alchStart`)
+Memberi tahu server untuk memulai proses brewing dengan reagen yang dipilih.
 ```text
-%xt%zm%crafting%1%getAlchWait%{Reagent 1 ID}%{Reagent 2 ID}%true%Ready to Mix%{Reagent 1}%{Reagent 2}%{Alchemy Rune}%{Trait}%
+%xt%zm%crafting%1%alchStart%{Reagent 1 ID}%{Reagent 2 ID}%{Alchemy Rune}%1%{Trait}%
 ```
+*Respon Server*: `{"t":"xt","b":{"r":-1,"o":{"cmd":"alchStart","ok":1}}}`
 
-### B. Packet COMPLETE (`checkAlchComplete`)
+### B. Packet COMPLETE (`alchDone`)
 Memberi tahu server bahwa proses mixing selesai untuk mengklaim hasil potion ke inventory.
 ```text
-%xt%zm%crafting%1%checkAlchComplete%{Reagent 1 ID}%{Reagent 2 ID}%true%Mix Complete%{Reagent 1}%{Reagent 2}%{Alchemy Rune}%{Trait}%
+%xt%zm%crafting%1%alchDone%
 ```
+*Respon Server*: `turnIn` (reagen dikurangi), `addItems` (+7 potion), `ccqr` (quest complete), `alchDone ok: 1`.
 
 ---
 
@@ -30,9 +32,8 @@ Field dari setiap item di [`packet_alchemy.json`](file:///pxnda/sakib.my.id/aqw/
 | :--- | :--- | :--- | :--- | :--- |
 | `{Reagent 1 ID}` | `"Reagent 1 ID"` | String | `""` | ID item reagen pertama |
 | `{Reagent 2 ID}` | `"Reagent 2 ID"` | String | `""` | ID item reagen kedua (kosong bila `None`) |
-| `{Reagent 1}` | `"Reagent 1"` | String | `"-"` | Nama reagen pertama |
-| `{Reagent 2}` | `"Reagent 2"` | String | `"-"` | Nama reagen kedua (atau `"None"`) |
 | `{Alchemy Rune}` | `"Alchemy Rune"` | String | `""` | *Jera*, *Fehu*, *Gebo*, *Uruz* |
+| `1` | Katalis | Integer | `1` | Dragon Runestone katalis aktif |
 | `{Trait}` | `"Trait"` | String | `""` | *Moose*, *Eva*, *End*, *Wis*, *Dam*, dll. |
 
 ### Catalyst Wajib (Inventory)
@@ -41,24 +42,24 @@ Field dari setiap item di [`packet_alchemy.json`](file:///pxnda/sakib.my.id/aqw/
 | **Dragon Runestone** | `7132` | 1x per brew | **Wajib ada di inventory** untuk setiap kali brewing. Tanpa item ini di inventory, server tidak akan memproses racikan potion dari daftar ini. |
 
 > **Catatan Resep 1 Reagen**:
-> Bila reagen 2 bernilai `"None"`, maka `{Reagent 2 ID}` bernilai kosong `""`, dan `{Reagent 2}` bernilai `"None"`.  
-> Contoh: `%xt%zm%crafting%1%getAlchWait%11469%%true%Ready to Mix%Nimblestem%None%Fehu%Moose%`
+> Bila reagen 2 bernilai `"None"`, maka `{Reagent 2 ID}` bernilai kosong `""`.  
+> Contoh: `%xt%zm%crafting%1%alchStart%11469%%Fehu%1%Moose%`
 
 ---
 
-## 3. Syarat & Konfigurasi Eksekusi Spammer
+## 3. Syarat & Konfigurasi Eksekusi Timing
 
-Sesuai panduan di modul Alchemy:
+Sesuai update patch sistem Alchemy:
 1. **Syarat Karakter**: Minimal **Rank 8 Alchemy**.
 2. **Item yang Wajib Dimiliki di Inventory**:
-   - **Dragon Runestone** (Item ID: `7132`) — **Wajib ada untuk setiap brew** (dikonsumsi 1x per attempt). Dapat dibeli di Swindle Bilk atau shop `/join alchemyacademy` (rate sukses target ~90%).
+   - **Dragon Runestone** (Item ID: `7132`) — Dikonsumsi 1x per attempt.
    - **Reagent 1** (misal: *Arashtite Ore*, *Doomatter*, *Chaoroot*, dll.)
    - **Reagent 2** (jika resep membutuhkan 2 reagen)
-3. **Urutan Eksekusi Packet**:
-   - Baris 1: Packet `START`
-   - Baris 2: Packet `COMPLETE`
-4. **Delay Loop**:
-   - Atur spammer delay ke **1200 ms** atau **2000 ms** per loop.
+3. **Alur & Siklus Waktu (*Timing Cycle*)**:
+   - **Langkah 1**: Kirim packet `alchStart`
+   - **Langkah 2**: Tunggu **18 detik (18.000 ms)** (durasi mini-game wajar server agar tidak ditolak dengan pesan *"Finished too quickly"*).
+   - **Langkah 3**: Kirim packet `alchDone`
+   - **Langkah 4**: Cooldown istirahat **2 detik (2.000 ms)** sebelum mengulang kembali ke Langkah 1.
 
 ---
 
@@ -78,12 +79,14 @@ Sesuai panduan di modul Alchemy:
 ```
 * **Packet START**:
   ```text
-  %xt%zm%crafting%1%getAlchWait%11473%11469%true%Ready to Mix%Arashtite Ore%Nimblestem%Jera%Moose%
+  %xt%zm%crafting%1%alchStart%11473%11469%Jera%1%Moose%
   ```
+* **Wait**: 18 detik (18.000 ms)
 * **Packet COMPLETE**:
   ```text
-  %xt%zm%crafting%1%checkAlchComplete%11473%11469%true%Mix Complete%Arashtite Ore%Nimblestem%Jera%Moose%
+  %xt%zm%crafting%1%alchDone%
   ```
+* **Cooldown**: 2 detik (2.000 ms)
 
 ### Contoh 2: Formula 1 Reagen (Aim Elixir)
 ```json
@@ -99,12 +102,14 @@ Sesuai panduan di modul Alchemy:
 ```
 * **Packet START**:
   ```text
-  %xt%zm%crafting%1%getAlchWait%11469%%true%Ready to Mix%Nimblestem%None%Fehu%Moose%
+  %xt%zm%crafting%1%alchStart%11469%%Fehu%1%Moose%
   ```
+* **Wait**: 18 detik (18.000 ms)
 * **Packet COMPLETE**:
   ```text
-  %xt%zm%crafting%1%checkAlchComplete%11469%%true%Mix Complete%Nimblestem%None%Fehu%Moose%
+  %xt%zm%crafting%1%alchDone%
   ```
+* **Cooldown**: 2 detik (2.000 ms)
 
 ---
 

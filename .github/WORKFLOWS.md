@@ -53,16 +53,18 @@ Jika Anda ingin memeriksa perubahan secara lokal sebelum dikirim ke GitHub:
 
 ### File Apa Saja yang Otomatis Diperbarui oleh `bump-version.ps1`?
 
-Script tersebut menyinkronkan 4 file sekaligus agar versi aplikasi konsisten:
+Script tersebut menyinkronkan 5 file sekaligus agar versi dan tanggal aplikasi konsisten:
 1. **`Properties/AssemblyInfo.cs`**:
    - Memperbarui `[assembly: AssemblyVersion("X.X.X.0")]`
    - Memperbarui `[assembly: AssemblyFileVersion("X.X.X.0")]`
 2. **`Grimoire/Tools/CodexBankManager.cs`**:
    - Memperbarui konstanta `CURRENT_APP_VERSION = "X.X.X";`
-3. **`CodexBank/manifest.json`**:
+3. **`Grimoire/Program.cs`**:
+   - Memperbarui `ReleaseDate = "DD-MM-YYYY";` otomatis mengambil tanggal saat script dijalankan (tanggal hari rilis).
+4. **`CodexBank/manifest.json`**:
    - Memperbarui `"app_version": "X.X.X"`
    - Memperbarui `"changelog": "Grimlite Li x CODEX vX.X.X - <Catatan>"`
-4. **`.github/scripts/generate_manifest.py`**:
+5. **`.github/scripts/generate_manifest.py`**:
    - Memperbarui nilai fallback default versi.
 
 ---
@@ -173,6 +175,14 @@ Apakah masih bisa build di komputer lokal? **Tentu saja, keduanya saling melengk
 ---
 
 ## 📋 Riwayat Versi & Changelog
+
+### v2.0.8
+* **Patch (Alchemy: NewPackets & Cooldown)**: Update packet post-patch AQW Chemicotron (`alchStart` & `alchDone`) dan penyesuaian server-side cooldown delay (18s mixing wait & 2s cooldown).
+* **Note**: Update: Patch Alchemist: NewPackets and Cooldown, fvck you AE. sorry now need longer time to work on server-side.
+
+### v2.0.7
+* **New Feature (CODEX > Alchemist)**: Auto Brew Potions (Otomatisasi pembuatan potion dengan antarmuka terintegrasi, live inventory checker status reagen/katalis Dragon Runestone, dan auto-stop saat bahan habis).
+* **Fix / Tweak**: Patch fix pada Packet > Sniffer.
 
 ### v2.0.6
 * **New Custom Skins**: Option > UI Skins (Kustomisasi tema warna tombol, border, tab, dan preset tema).

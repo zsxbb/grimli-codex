@@ -380,25 +380,31 @@ namespace Grimoire.UI
                     // 1. Packet START
                     SafeInvoke(() =>
                     {
-                        lblStatus.Text = $"[{brewStep}/{targetCount}] Sending START packet...";
+                        lblStatus.Text = $"[{brewStep}/{targetCount}] Starting mix: {recipe.PotionName}...";
                     });
 
                     await Proxy.Instance.SendToServer(recipe.GetPacketStart());
 
-                    // Delay 1200 ms
-                    await Task.Delay(1200, token);
+                    // Wait 18 seconds with live countdown
+                    for (int sec = 18; sec > 0; sec--)
+                    {
+                        if (token.IsCancellationRequested) break;
+                        int remainingSec = sec;
+                        SafeInvoke(() =>
+                        {
+                            lblStatus.Text = $"[{brewStep}/{targetCount}] Mixing in progress... {remainingSec}s remaining";
+                        });
+                        await Task.Delay(1000, token);
+                    }
                     if (token.IsCancellationRequested) break;
 
-                    // 2. Packet COMPLETE
+                    // 2. Packet COMPLETE (alchDone)
                     SafeInvoke(() =>
                     {
-                        lblStatus.Text = $"[{brewStep}/{targetCount}] Sending COMPLETE packet...";
+                        lblStatus.Text = $"[{brewStep}/{targetCount}] Completing mix (alchDone)...";
                     });
 
                     await Proxy.Instance.SendToServer(recipe.GetPacketComplete());
-
-                    // Delay 1200 ms
-                    await Task.Delay(1200, token);
 
                     current++;
 
@@ -409,6 +415,22 @@ namespace Grimoire.UI
                         Player.Inventory?.InvalidateCache();
                         UpdateMaterialStatus();
                     });
+
+                    // Cooldown 2 seconds before next mix if more remain
+                    if (current < targetCount)
+                    {
+                        for (int cd = 2; cd > 0; cd--)
+                        {
+                            if (token.IsCancellationRequested) break;
+                            int remainingCd = cd;
+                            SafeInvoke(() =>
+                            {
+                                lblStatus.Text = $"[{current}/{targetCount}] Cooldown before next mix: {remainingCd}s...";
+                            });
+                            await Task.Delay(1000, token);
+                        }
+                        if (token.IsCancellationRequested) break;
+                    }
                 }
             }
             catch (TaskCanceledException)

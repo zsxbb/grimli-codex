@@ -39,24 +39,15 @@ namespace Grimoire.Tools
         {
             string p1 = Reagent1Id ?? "";
             string p2 = HasReagent2 ? (Reagent2Id ?? "") : "";
-            string n1 = string.IsNullOrEmpty(Reagent1) ? "-" : Reagent1;
-            string n2 = HasReagent2 ? (string.IsNullOrEmpty(Reagent2) ? "-" : Reagent2) : "None";
             string rune = AlchemyRune ?? "";
             string trait = Trait ?? "";
 
-            return $"%xt%zm%crafting%1%getAlchWait%{p1}%{p2}%true%Ready to Mix%{n1}%{n2}%{rune}%{trait}%";
+            return $"%xt%zm%crafting%1%alchStart%{p1}%{p2}%{rune}%1%{trait}%";
         }
 
         public string GetPacketComplete()
         {
-            string p1 = Reagent1Id ?? "";
-            string p2 = HasReagent2 ? (Reagent2Id ?? "") : "";
-            string n1 = string.IsNullOrEmpty(Reagent1) ? "-" : Reagent1;
-            string n2 = HasReagent2 ? (string.IsNullOrEmpty(Reagent2) ? "-" : Reagent2) : "None";
-            string rune = AlchemyRune ?? "";
-            string trait = Trait ?? "";
-
-            return $"%xt%zm%crafting%1%checkAlchComplete%{p1}%{p2}%true%Mix Complete%{n1}%{n2}%{rune}%{trait}%";
+            return "%xt%zm%crafting%1%alchDone%";
         }
 
         public override string ToString()

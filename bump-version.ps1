@@ -5,6 +5,7 @@
     Script ini menyinkronkan penomoran versi di semua file proyek:
       - Properties/AssemblyInfo.cs (AssemblyVersion & AssemblyFileVersion)
       - Grimoire/Tools/CodexBankManager.cs (CURRENT_APP_VERSION)
+      - Grimoire/Program.cs (ReleaseDate otomatis ke tanggal saat rilis)
       - CodexBank/manifest.json (app_version & changelog)
       - .github/scripts/generate_manifest.py (fallback app_version)
     Serta membuat git commit, git tag (misal: v2.0.3), dan opsi push langsung ke GitHub.
@@ -68,6 +69,18 @@ if (Test-Path $codexBankManagerPath) {
     Write-Host "[OK] Updated CodexBankManager.cs -> $CleanVer" -ForegroundColor Green
 } else {
     Write-Warning "CodexBankManager.cs tidak ditemukan di $codexBankManagerPath"
+}
+
+# 3b. Update Grimoire/Program.cs (ReleaseDate otomatis ke tanggal hari ini)
+$programCsPath = Join-Path $repoRoot "Grimoire\Program.cs"
+if (Test-Path $programCsPath) {
+    $todayDate = (Get-Date).ToString("dd-MM-yyyy")
+    $content = Get-Content $programCsPath -Raw -Encoding UTF8
+    $content = $content -replace 'public static readonly string ReleaseDate = "[^"]+";', "public static readonly string ReleaseDate = `"$todayDate`";"
+    Set-Content -Path $programCsPath -Value $content -Encoding UTF8
+    Write-Host "[OK] Updated Program.cs ReleaseDate -> $todayDate" -ForegroundColor Green
+} else {
+    Write-Warning "Program.cs tidak ditemukan di $programCsPath"
 }
 
 # 4. Update CodexBank/manifest.json

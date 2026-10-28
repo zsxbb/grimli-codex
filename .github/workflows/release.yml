@@ -29,6 +29,18 @@ jobs:
       - name: Restore NuGet Packages
         run: nuget restore "Project Grimlite.sln"
 
+      - name: Sync Release Date in Program.cs
+        shell: pwsh
+        run: |
+          $today = (Get-Date).ToString("dd-MM-yyyy")
+          $file = "Grimoire/Program.cs"
+          if (Test-Path $file) {
+            $content = Get-Content $file -Raw -Encoding UTF8
+            $content = $content -replace 'public static readonly string ReleaseDate = "[^"]+";', "public static readonly string ReleaseDate = `"$today`";"
+            Set-Content -Path $file -Value $content -Encoding UTF8
+            Write-Host "Synced Program.cs ReleaseDate to $today"
+          }
+
       - name: Build Solution (Release x86)
         run: |
           msbuild "Project Grimlite.sln" /p:Configuration=Release /p:Platform=x86 /p:RestorePackages=false /m
