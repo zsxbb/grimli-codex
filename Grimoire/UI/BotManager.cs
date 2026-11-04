@@ -34,7 +34,7 @@ using System.Runtime.InteropServices;
 
 namespace Grimoire.UI
 {
-    public partial class BotManager : DarkForm
+    public partial class BotManager : GrimDarkForm
     {
         private IBotEngine _activeBotEngine = new Bot();
 

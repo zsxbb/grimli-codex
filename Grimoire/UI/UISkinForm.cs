@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace Grimoire.UI
 {
-    public partial class UISkinForm : DarkForm
+    public partial class UISkinForm : GrimDarkForm
     {
         public static UISkinForm Instance = new UISkinForm();
 

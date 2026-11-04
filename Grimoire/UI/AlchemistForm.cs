@@ -12,7 +12,7 @@ using Grimoire.Tools;
 
 namespace Grimoire.UI
 {
-    public partial class AlchemistForm : DarkForm
+    public partial class AlchemistForm : GrimDarkForm
     {
         public static AlchemistForm Instance { get; } = new AlchemistForm();
 

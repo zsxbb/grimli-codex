@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Grimoire.UI
 {
-	public partial class PvP : DarkForm
+	public partial class PvP : GrimDarkForm
 	{
 		public PvP()
 		{

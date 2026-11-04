@@ -17,7 +17,7 @@ using Grimoire.Tools;
 
 namespace Grimoire.UI
 {
-	public partial class PacketInterceptor : DarkForm
+	public partial class PacketInterceptor : GrimDarkForm
 	{
 		public PacketInterceptor()
 		{

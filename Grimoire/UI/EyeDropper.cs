@@ -7,7 +7,7 @@ using static Unity3.Eyedropper.EyeDropper;
 
 namespace Grimoire.UI
 {
-    public partial class EyeDropper : DarkForm
+    public partial class EyeDropper : GrimDarkForm
     {
         public EyeDropper()
         {

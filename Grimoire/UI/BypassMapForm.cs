@@ -9,7 +9,7 @@ using Grimoire.Networking;
 
 namespace Grimoire.UI
 {
-    public partial class BypassMapForm : DarkForm
+    public partial class BypassMapForm : GrimDarkForm
     {
         public static BypassMapForm Instance { get; } = new BypassMapForm();
 

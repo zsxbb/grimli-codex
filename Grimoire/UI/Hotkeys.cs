@@ -19,7 +19,7 @@ using System.Windows.Forms;
 
 namespace Grimoire.UI
 {
-	public class Hotkeys : DarkForm
+	public class Hotkeys : GrimDarkForm
 	{
 		public static readonly Action[] Actions = new Action[]
 		{

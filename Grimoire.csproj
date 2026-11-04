@@ -69,7 +69,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>4zvbZ3m.ico</ApplicationIcon>
+    <ApplicationIcon>grimlixcodex.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
@@ -301,6 +301,7 @@
     </Compile>
     <Compile Include="Grimoire\UI\UISkinManager.cs" />
     <Compile Include="Grimoire\UI\ThemedTabControl.cs" />
+    <Compile Include="Grimoire\UI\GrimDarkForm.cs" />
     <Compile Include="Grimoire\Tools\CodexBankManager.cs" />
     <Compile Include="Grimoire\Tools\VoiceChatManager.cs" />
     <Compile Include="Grimoire\Tools\ClientConfig.cs" />
@@ -759,7 +760,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="4zvbZ3m.ico" />
+    <Content Include="grimlixcodex.ico" />
     <Content Include="ClientConfig.cfg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

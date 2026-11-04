@@ -209,6 +209,19 @@ namespace Grimoire.UI
             {
                 f.BackColor = BaseColor;
             }
+            else if (ctrl is ThemedTabControl ttc)
+            {
+                ttc.myBackColor = BaseColor;
+                ttc.BackColor = BaseColor;
+                ttc.ForeColor = TextColor;
+                foreach (TabPage page in ttc.TabPages)
+                {
+                    page.BackColor = BaseColor;
+                    page.ForeColor = TextColor;
+                }
+                ttc.SyncTabPages();
+                ttc.Invalidate();
+            }
             else if (ctrl is FlatTabControl.FlatTabControl ftc)
             {
                 ftc.myBackColor = BaseColor;
@@ -219,7 +232,7 @@ namespace Grimoire.UI
                     page.BackColor = BaseColor;
                     page.ForeColor = TextColor;
                 }
-                ftc.Invalidate(true);
+                ftc.Invalidate();
             }
             else if (ctrl is TabPage tp)
             {

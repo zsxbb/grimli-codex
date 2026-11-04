@@ -9,7 +9,7 @@ using Grimoire.Tools;
 
 namespace Grimoire.UI
 {
-    public partial class AppUpdateDialog : DarkForm
+    public partial class AppUpdateDialog : GrimDarkForm
     {
         private readonly CodexManifest _manifest;
         private CancellationTokenSource _cts;

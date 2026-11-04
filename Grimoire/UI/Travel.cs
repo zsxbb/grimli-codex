@@ -15,7 +15,7 @@ using Grimoire.Tools;
 
 namespace Grimoire.UI
 {
-    public class Travel : DarkForm
+    public class Travel : GrimDarkForm
     {
         private IContainer components;
         private DarkButton btnDage;

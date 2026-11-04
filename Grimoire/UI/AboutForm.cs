@@ -10,7 +10,7 @@ using Grimoire.Tools;
 
 namespace Grimoire.UI
 {
-	public partial class AboutForm : DarkForm
+	public partial class AboutForm : GrimDarkForm
 	{
 		public AboutForm()
 		{

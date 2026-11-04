@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Grimoire.UI
 {
-    public partial class CodexEnrageForm : DarkForm
+    public partial class CodexEnrageForm : GrimDarkForm
     {
         public static CodexEnrageForm Instance { get; } = new CodexEnrageForm();
 

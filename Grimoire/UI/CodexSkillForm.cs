@@ -13,7 +13,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Grimoire.UI
 {
-    public partial class CodexSkillForm : DarkForm
+    public partial class CodexSkillForm : GrimDarkForm
     {
         public static CodexSkillForm Instance { get; } = new CodexSkillForm();
 

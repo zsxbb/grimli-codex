@@ -15,7 +15,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Grimoire.UI
 {
-    public partial class DPSForm : DarkForm
+    public partial class DPSForm : GrimDarkForm
     {
         public DPSForm()
         {

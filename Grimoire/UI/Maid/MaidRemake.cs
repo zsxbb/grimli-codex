@@ -1,3 +1,4 @@
+using Grimoire.UI;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ using System.Collections.Generic;
 
 namespace Grimoire.UI.Maid
 {
-    public partial class MaidRemake : DarkForm
+    public partial class MaidRemake : GrimDarkForm
     {
         public static MaidRemake Instance { get; } = new MaidRemake();
 
@@ -100,6 +101,7 @@ namespace Grimoire.UI.Maid
                 "\n.start => turn on Maid" +
                 "\n.stop => turn off Maid"
                 );
+            toolTip.SetToolTip(this.cbAutoPots, "Auto use skill 5 (Potion/Scroll) on cooldown during combat");
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
@@ -263,6 +265,11 @@ namespace Grimoire.UI.Maid
                             // do attack with skills
                             if (Player.HasTarget)
                             {
+                                if (cbAutoPots.Checked && Player.SkillAvailable("5") <= 0)
+                                {
+                                    useSkill("5");
+                                }
+
                                 //For class with some aura detection or Ultragramiel boss fight
                                 await SpecialCombo();
                                 if (tauntTask == null)
@@ -1368,6 +1375,7 @@ namespace Grimoire.UI.Maid
                 SpecialMsg = tbSpecialMsg.Text,
                 SpecialAct = (int)numSkillAct.Value,
                 AntiCounter = cbAntiCounter.Checked,
+                AutoPots = cbAutoPots.Checked,
                 UltraBossExtra = cmbUltraBoss.SelectedIndex,
             };
         }
@@ -1476,6 +1484,7 @@ namespace Grimoire.UI.Maid
             cbAttackPriority.Checked = config.AttackPriority ?? cbAttackPriority.Checked;
             cbCopyWalk.Checked = config.CopyWalk ?? cbCopyWalk.Checked;
             cbAntiCounter.Checked = config.AntiCounter ?? cbAntiCounter.Checked;
+            cbAutoPots.Checked = config.AutoPots ?? cbAutoPots.Checked;
             /*cmbUltraBoss.SelectedIndex = config.UltraBossExtra;
 			cmbGotoUsername.Text = config.Target;
 			tbSkillList.Text = config.SkillList;

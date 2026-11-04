@@ -9,7 +9,7 @@ using Grimoire.Tools;
 
 namespace Grimoire.UI
 {
-    public partial class CodexBankForm : DarkForm
+    public partial class CodexBankForm : GrimDarkForm
     {
         public static CodexBankForm Instance { get; } = new CodexBankForm();
 

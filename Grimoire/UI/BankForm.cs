@@ -14,7 +14,7 @@ using DarkUI.Forms;
 
 namespace Grimoire.UI
 {
-    public partial class BankForm : DarkForm
+    public partial class BankForm : GrimDarkForm
     {
         public BankForm()
         {

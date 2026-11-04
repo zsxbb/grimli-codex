@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Grimoire.UI
 {
-    public partial class Notepad : DarkForm
+    public partial class Notepad : GrimDarkForm
     {
         public Notepad()
         {

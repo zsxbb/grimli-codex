@@ -8,7 +8,7 @@ using Grimoire.Tools;
 
 namespace Grimoire.UI
 {
-    public partial class CodexForm : DarkForm
+    public partial class CodexForm : GrimDarkForm
     {
         public static CodexForm Instance { get; } = new CodexForm();
 

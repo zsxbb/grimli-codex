@@ -176,6 +176,11 @@ Apakah masih bisa build di komputer lokal? **Tentu saja, keduanya saling melengk
 
 ## 📋 Riwayat Versi & Changelog
 
+### v2.1.0
+* **New Icon**
+* **Performance Update**
+* **Fix Bug Old Grimoire**
+
 ### v2.0.9
 * **Alchemist (Auto Brew)**:
   * Filter auto-pickup khusus potion yang ditargetkan (non-target byproduct potions dibiarkan di game tanpa di-pickup).

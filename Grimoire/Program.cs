@@ -12,7 +12,7 @@ namespace Grimoire
 	internal static class Program
 	{
 		public static readonly string Version = "CODEX";
-		public static readonly string ReleaseDate = "28-10-2026";
+		public static readonly string ReleaseDate = "04-11-2026";
 		public static string PluginsPath { get; private set; }
 		public static Tools.Plugins.PluginManager PluginsManager { get; private set; }
 
@@ -118,5 +118,6 @@ namespace Grimoire
 		}
 	}
 }
+
 
 

@@ -322,10 +322,12 @@ namespace Grimoire.UI
             this.Controls.Add(this.lblSearch);
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(220)))));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = global::Properties.Resources.GrimoireIcon;
             this.MaximizeBox = false;
-            this.MinimizeBox = false;
+            this.MinimizeBox = true;
             this.Name = "AlchemistForm";
-            this.ShowIcon = false;
+            this.ShowIcon = true;
+            this.ShowInTaskbar = true;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "CODEX Alchemist";
             this.TopMost = true;

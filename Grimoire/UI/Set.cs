@@ -16,7 +16,7 @@ using DarkUI.Forms;
 
 namespace Grimoire.UI
 {
-    public partial class Set : DarkForm
+    public partial class Set : GrimDarkForm
     {
         private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
         {

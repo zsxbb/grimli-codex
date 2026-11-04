@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Grimoire.UI
 {
-    public class PacketTamperer : DarkForm
+    public class PacketTamperer : GrimDarkForm
     {
         private IContainer components;
 

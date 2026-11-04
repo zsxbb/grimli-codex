@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace Grimoire.UI
 {
-	public partial class DevTest : DarkForm
+	public partial class DevTest : GrimDarkForm
 	{
 		public DevTest()
 		{

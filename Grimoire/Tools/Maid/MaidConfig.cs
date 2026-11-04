@@ -1,4 +1,4 @@
-﻿namespace Grimoire.Tools.Maid
+namespace Grimoire.Tools.Maid
 {
 	internal class MaidConfig
 	{
@@ -25,6 +25,7 @@
         public bool? WhitelistMap { get; set; }
         public bool? GlobalHotkey{ get; set; }
 		public bool? SafeSkill{ get; set; }
+		public bool? AutoPots { get; set; }
 		
     }
 }

@@ -1,3 +1,4 @@
+using Grimoire.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using Grimoire.Tools.Maid;
 
 namespace MaidRemake.LockedMapHandle
 {
-    public partial class LockedMapForm : DarkForm
+    public partial class LockedMapForm : GrimDarkForm
     {
         public static LockedMapForm Instance { get; } = new LockedMapForm();
 

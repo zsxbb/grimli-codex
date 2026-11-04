@@ -52,6 +52,7 @@ namespace Grimoire.UI.Maid
             this.cbStopAttack = new DarkUI.Controls.DarkCheckBox();
             this.cbEnableGlobalHotkey = new DarkUI.Controls.DarkCheckBox();
             this.gbAdvancedOptions = new DarkUI.Controls.DarkGroupBox();
+            this.cbAutoPots = new DarkUI.Controls.DarkCheckBox();
             this.cbAntiCounter = new DarkUI.Controls.DarkCheckBox();
             this.cbCopyWalk = new DarkUI.Controls.DarkCheckBox();
             this.numHealthPercent = new DarkUI.Controls.DarkNumericUpDown();
@@ -352,6 +353,7 @@ namespace Grimoire.UI.Maid
             // 
             // gbAdvancedOptions
             // 
+            this.gbAdvancedOptions.Controls.Add(this.cbAutoPots);
             this.gbAdvancedOptions.Controls.Add(this.cbAntiCounter);
             this.gbAdvancedOptions.Controls.Add(this.cbCopyWalk);
             this.gbAdvancedOptions.Controls.Add(this.numHealthPercent);
@@ -384,6 +386,15 @@ namespace Grimoire.UI.Maid
             this.cbAntiCounter.TabIndex = 29;
             this.cbAntiCounter.Text = "Anti Counter";
             this.cbAntiCounter.CheckedChanged += new System.EventHandler(this.cbAntiCounter_CheckedChanged);
+            // 
+            // cbAutoPots
+            // 
+            this.cbAutoPots.AutoSize = true;
+            this.cbAutoPots.Location = new System.Drawing.Point(105, 89);
+            this.cbAutoPots.Name = "cbAutoPots";
+            this.cbAutoPots.Size = new System.Drawing.Size(75, 17);
+            this.cbAutoPots.TabIndex = 30;
+            this.cbAutoPots.Text = "Auto Pots";
             // 
             // cbCopyWalk
             // 
@@ -785,6 +796,7 @@ namespace Grimoire.UI.Maid
 		private DarkUI.Controls.DarkLabel darkLabel5;
 		private DarkUI.Controls.DarkComboBox cmbUltraBoss;
 		public DarkUI.Controls.DarkCheckBox cbAntiCounter;
+		public DarkUI.Controls.DarkCheckBox cbAutoPots;
 		private DarkUI.Controls.DarkCheckBox cbSpecialAnims;
 		
 		

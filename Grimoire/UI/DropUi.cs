@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace Grimoire.UI
 {
-    public partial class DropUi : DarkForm
+    public partial class DropUi : GrimDarkForm
     {
         public static DropUi instance { get; } = new DropUi();
 

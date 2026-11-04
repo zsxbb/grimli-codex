@@ -13,6 +13,28 @@ namespace Grimoire.UI
             this.SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
         }
 
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.Style |= 0x02000000; // WS_CLIPCHILDREN: clip child TabPage areas so parent background doesn't overwrite children
+                return cp;
+            }
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            SyncTabPages();
+        }
+
+        protected override void OnControlAdded(ControlEventArgs e)
+        {
+            base.OnControlAdded(e);
+            SyncTabPages();
+        }
+
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
@@ -27,8 +49,12 @@ namespace Grimoire.UI
             }
             if (newHover != _hoveredIndex)
             {
+                int oldHover = _hoveredIndex;
                 _hoveredIndex = newHover;
-                this.Invalidate(true);
+                if (oldHover >= 0 && oldHover < this.TabCount)
+                    this.Invalidate(this.GetTabRect(oldHover));
+                if (_hoveredIndex >= 0 && _hoveredIndex < this.TabCount)
+                    this.Invalidate(this.GetTabRect(_hoveredIndex));
             }
         }
 
@@ -37,15 +63,43 @@ namespace Grimoire.UI
             base.OnMouseLeave(e);
             if (_hoveredIndex != -1)
             {
+                int oldHover = _hoveredIndex;
                 _hoveredIndex = -1;
-                this.Invalidate(true);
+                if (oldHover >= 0 && oldHover < this.TabCount)
+                    this.Invalidate(this.GetTabRect(oldHover));
             }
         }
 
         protected override void OnSelectedIndexChanged(EventArgs e)
         {
             base.OnSelectedIndexChanged(e);
-            this.Invalidate(true);
+            SyncTabPages();
+            Rectangle headerArea = new Rectangle(0, 0, this.Width, this.ItemSize.Height + 6);
+            this.Invalidate(headerArea);
+        }
+
+        public void SyncTabPages()
+        {
+            if (this.TabPages.Count == 0) return;
+            try
+            {
+                TabPage selected = this.SelectedTab;
+                for (int i = 0; i < this.TabPages.Count; i++)
+                {
+                    TabPage page = this.TabPages[i];
+                    bool isSelected = (page == selected);
+                    if (page.Visible != isSelected)
+                    {
+                        page.Visible = isSelected;
+                    }
+                }
+                if (selected != null)
+                {
+                    selected.BringToFront();
+                    selected.Invalidate(true);
+                }
+            }
+            catch { }
         }
 
         protected override void OnPaint(PaintEventArgs e)

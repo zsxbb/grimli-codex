@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Grimoire.UI
 {
-    public partial class QuestPinnerForm : DarkForm
+    public partial class QuestPinnerForm : GrimDarkForm
     {
         public static QuestPinnerForm Instance { get; } = new QuestPinnerForm();
 

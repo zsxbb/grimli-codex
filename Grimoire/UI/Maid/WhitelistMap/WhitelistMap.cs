@@ -1,3 +1,4 @@
+using Grimoire.UI;
 using DarkUI.Forms;
 using Grimoire.Game;
 using Grimoire.Tools;
@@ -10,7 +11,7 @@ using System.Windows.Forms;
 
 namespace MaidRemake.WhitelistMap
 {
-	public partial class WhitelistMapForm : DarkForm
+	public partial class WhitelistMapForm : GrimDarkForm
 	{
 		public static WhitelistMapForm Instance { get; } = new WhitelistMapForm();
 
