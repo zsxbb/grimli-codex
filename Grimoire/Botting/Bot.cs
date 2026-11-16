@@ -489,7 +489,7 @@ namespace Grimoire.Botting
             }
         }
 
-        private void OnItemDropped(InventoryItem drop)
+        private async void OnItemDropped(InventoryItem drop)
         {
             if (drop == null) return;
             NotifyDrop(drop);
@@ -502,18 +502,14 @@ namespace Grimoire.Botting
 
             if (shouldPickup)
             {
-                Task.Run(async () =>
+                try
                 {
-                    try
-                    {
-                        await Task.Delay(150);
-                        await World.DropStack.GetDrop(drop.Id);
-                    }
-                    catch (Exception ex)
-                    {
-                        LogForm.Instance.devDebug($"[Bot Drop Pickup Error] {ex.Message}");
-                    }
-                });
+                    await World.DropStack.GetDrop(drop.Id);
+                }
+                catch (Exception ex)
+                {
+                    LogForm.Instance.devDebug($"[Bot Drop Pickup Error] {ex.Message}");
+                }
             }
         }
 

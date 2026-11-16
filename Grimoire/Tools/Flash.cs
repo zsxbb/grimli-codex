@@ -156,6 +156,21 @@ namespace Grimoire.Tools
             }
         }
 
+        private static string InvokeFlashCall(string request)
+        {
+            AxShockwaveFlash target = flash ?? Root.Instance?.flashPlayer;
+            if (target == null || target.IsDisposed)
+                return string.Empty;
+
+            if (target.InvokeRequired && target.IsHandleCreated)
+                return (string)target.Invoke(new Func<string>(() => target.CallFunction(request)));
+
+            if (Root.Instance != null && Root.Instance.InvokeRequired && Root.Instance.IsHandleCreated && !Root.Instance.IsDisposed)
+                return (string)Root.Instance.Invoke(new Func<string>(() => target.CallFunction(request)));
+
+            return target.CallFunction(request);
+        }
+
         public static object Call(string function, Type type, params object[] args)
         {
             try
@@ -168,7 +183,7 @@ namespace Grimoire.Tools
                     req.Append("</arguments>");
                 }
                 req.Append("</invoke>");
-                string result = flash.CallFunction(req.ToString());
+                string result = InvokeFlashCall(req.ToString());
                 XElement el = XElement.Parse(result);
                 return el == null || el.FirstNode == null ? default : Convert.ChangeType(el.FirstNode.ToString(), type);
             }
@@ -210,7 +225,7 @@ namespace Grimoire.Tools
         {
             try
             {
-                return HttpUtility.HtmlDecode(XElement.Parse(Root.Instance.flashPlayer.CallFunction(request)).FirstNode?.ToString() ?? string.Empty);
+                return HttpUtility.HtmlDecode(XElement.Parse(InvokeFlashCall(request)).FirstNode?.ToString() ?? string.Empty);
             }
             catch
             {

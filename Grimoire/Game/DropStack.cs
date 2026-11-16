@@ -116,59 +116,19 @@ namespace Grimoire.Game
             return false;
         }
 
+        private bool IsOnCooldown(int itemId)
+        {
+            lock (_lock)
+            {
+                return _cooldowns.TryGetValue(itemId, out Stopwatch sw) && sw.ElapsedMilliseconds < 800;
+            }
+        }
+
         public async Task<bool> GetDrop(int itemId)
         {
-            if (itemId <= 0)
+            if (itemId <= 0 || IsOnCooldown(itemId))
                 return false;
 
-            InventoryItem drop = null;
-            lock (_lock)
-            {
-                drop = _drops.FirstOrDefault(d => d.Id == itemId);
-            }
-
-            // If not found in DropStack, check ItemTree
-            if (drop == null)
-            {
-                try
-                {
-                    drop = World.ItemTree?.FirstOrDefault(i => i.Id == itemId);
-                }
-                catch { }
-            }
-
-            // Drop Protection check (only for non-AC, non-temporary items when bot is actively running)
-            if (drop != null && !drop.IsTemporary && !drop.IsAcItem && BotManager.Instance.ActiveBotEngine.IsRunning)
-            {
-                try
-                {
-                    if (!Player.Inventory.HasSpaceFor(drop))
-                    {
-                        LogForm.Instance.devDebug($"[DropProtection] Inventory full, delayed pickup for {drop.Name} ({drop.Id})");
-                        return false;
-                    }
-                }
-                catch { }
-            }
-
-            // Cooldown throttle (800ms) to prevent packet spam
-            lock (_lock)
-            {
-                if (_cooldowns.TryGetValue(itemId, out Stopwatch sw))
-                {
-                    if (sw.ElapsedMilliseconds < 800)
-                    {
-                        return false;
-                    }
-                    sw.Restart();
-                }
-                else
-                {
-                    _cooldowns[itemId] = Stopwatch.StartNew();
-                }
-            }
-
-            // Resolve RoomId with fallback retries
             int roomId = World.RoomId;
             if (roomId <= 0)
             {
@@ -196,7 +156,20 @@ namespace Grimoire.Game
                 return false;
             }
 
-            // Send packet to server: %xt%zm%getDrop%{roomId}%{itemId}%
+            lock (_lock)
+            {
+                if (_cooldowns.TryGetValue(itemId, out Stopwatch sw))
+                {
+                    if (sw.ElapsedMilliseconds < 800)
+                        return false;
+                    sw.Restart();
+                }
+                else
+                {
+                    _cooldowns[itemId] = Stopwatch.StartNew();
+                }
+            }
+
             string packet = $"%xt%zm%getDrop%{roomId}%{itemId}%";
             await Proxy.Instance.SendToServer(packet);
             LogForm.Instance.devDebug($"[GetDrop] Sent: {packet}");

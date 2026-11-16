@@ -176,6 +176,9 @@ Apakah masih bisa build di komputer lokal? **Tentu saja, keduanya saling melengk
 
 ## 📋 Riwayat Versi & Changelog
 
+### v2.1.1
+* **Fix auto accept drop bot**
+
 ### v2.1.0
 * **New Icon**
 * **Performance Update**

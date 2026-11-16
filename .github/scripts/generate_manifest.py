@@ -15,10 +15,10 @@ def main():
         return
 
     # Preserve top-level app metadata and per-script metadata from existing manifest
-    app_version = "2.1.0"
+    app_version = "2.1.1"
     app_download_url = "https://github.com/zsxbb/grimli-codex/releases/latest/download/Grimoire.exe"
     app_release_url = "https://github.com/zsxbb/grimli-codex/releases/latest"
-    changelog = "Grimlite Li x CODEX v2.1.0 - New Icon; Performance Update; Fix Bug Old Grimoire"
+    changelog = "Grimlite Li x CODEX v2.1.1 - Fix auto accept drop bot"
     existing_credits = {}
     existing_descriptions = {}
 
@@ -140,6 +140,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
